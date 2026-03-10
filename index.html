@@ -3,325 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Астроконсультант - Анкета (Отладка)</title>
+    <title>Астроконсультант - Анкета</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+        * {
             margin: 0;
-            padding: 16px;
-            line-height: 1.4;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        .greeting {
-            font-size: 16px;
-            margin-bottom: 24px;
-            color: var(--tg-theme-hint-color, #999999);
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #eeeeee);
-        }
-        .field {
-            margin-bottom: 24px;
-        }
-        .field-label {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-        .field-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--tg-theme-hint-color, #dddddd);
-            border-radius: 8px;
-            font-size: 16px;
-            background-color: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            color: var(--tg-theme-text-color, #000000);
+            padding: 0;
             box-sizing: border-box;
         }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--tg-theme-text-color, #000) 0%, var(--tg-theme-hint-color, #666) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--tg-theme-hint-color, #666666);
+            line-height: 1.5;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #e0e0e0);
+        }
+
+        /* Form */
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .field-label.required::after {
+            content: "*";
+            color: #ff4d4d;
+            margin-left: 4px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 14px;
+            font-size: 16px;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            color: var(--tg-theme-text-color, #000000);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .field-input:focus {
+            border-color: var(--tg-theme-button-color, #40a7e3);
+            background: var(--tg-theme-bg-color, #ffffff);
+        }
+
+        .field-input.error {
+            border-color: #ff4d4d;
+        }
+
+        .field-hint {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color, #999999);
+            margin-top: 4px;
+        }
+
+        .field-error {
+            font-size: 13px;
+            color: #ff4d4d;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .field-error.visible {
+            display: block;
+        }
+
+        /* Radio group */
         .radio-group {
             display: flex;
-            gap: 24px;
+            gap: 20px;
             padding: 8px 0;
         }
+
         .radio-option {
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            flex: 1;
         }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--tg-theme-button-color, #40a7e3);
+        }
+
+        .radio-option span {
+            font-size: 16px;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        /* Status messages */
+        .status {
+            margin: 20px 0;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status.success {
+            background: #4caf50;
+            color: white;
+            display: block;
+        }
+
+        .status.error {
+            background: #ff4d4d;
+            color: white;
+            display: block;
+        }
+
+        .status.info {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: white;
+            display: block;
+        }
+
+        /* Button */
         .submit-btn {
             width: 100%;
-            padding: 16px;
-            background-color: var(--tg-theme-button-color, #40a7e3);
+            padding: 18px;
+            background: var(--tg-theme-button-color, #40a7e3);
             color: var(--tg-theme-button-text-color, #ffffff);
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 24px;
-            margin-bottom: 16px;
-        }
-        .submit-btn.secondary {
-            background-color: #666;
-        }
-        .divider {
-            height: 1px;
-            background-color: var(--tg-theme-hint-color, #eeeeee);
-            margin: 24px 0;
-        }
-        .debug-panel {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 12px;
             margin-top: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            color: #333;
-            max-height: 200px;
-            overflow-y: auto;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(64, 167, 227, 0.3);
         }
-        .debug-panel div {
-            margin: 4px 0;
-            border-bottom: 1px solid #ddd;
-            padding: 4px;
+
+        .submit-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(64, 167, 227, 0.4);
         }
-        .status-message {
-            text-align: center;
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        .status-success {
-            background-color: #4caf50;
-            color: white;
-            display: block;
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
-        .status-error {
-            background-color: #f44336;
-            color: white;
-            display: block;
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dark theme adjustments */
+        @media (prefers-color-scheme: dark) {
+            .field-input {
+                border-color: #404040;
+            }
+            
+            .title {
+                background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Астроконсультант 🔮 (Отладка)</h1>
-        <div class="greeting">
-            Заполните данные для тестирования отправки
+        <div class="header">
+            <h1 class="title">Астроконсультант 🔮</h1>
+            <div class="subtitle">
+                Заполните анкету для получения персонального астрологического прогноза
+            </div>
         </div>
 
-        <form id="astroForm">
-            <!-- Поля формы как в предыдущей версии -->
+        <form id="astroForm" class="form" novalidate>
+            <!-- Имя -->
             <div class="field">
-                <div class="field-label">Ваше имя:</div>
-                <input type="text" id="name" class="field-input" value="Тест" required>
+                <label class="field-label required">Ваше имя</label>
+                <input type="text" 
+                       id="name" 
+                       class="field-input" 
+                       placeholder="Введите ваше имя"
+                       maxlength="50"
+                       required>
+                <div class="field-error" id="nameError">Пожалуйста, укажите ваше имя</div>
             </div>
 
+            <!-- Дата рождения -->
             <div class="field">
-                <div class="field-label">Дата рождения:</div>
-                <input type="text" id="birthday" class="field-input" value="01.01.1990" required>
+                <label class="field-label required">Дата рождения</label>
+                <input type="text" 
+                       id="birthday" 
+                       class="field-input" 
+                       placeholder="ДД.ММ.ГГГГ"
+                       maxlength="10"
+                       required>
+                <div class="field-hint">Формат: ДД.ММ.ГГГГ (например, 15.05.1985)</div>
+                <div class="field-error" id="birthdayError">Введите дату в формате ДД.ММ.ГГГГ</div>
             </div>
 
+            <!-- Время рождения (необязательно) -->
             <div class="field">
-                <div class="field-label">Место рождения:</div>
-                <input type="text" id="birthplace" class="field-input" value="Москва" required>
+                <label class="field-label">Время рождения</label>
+                <input type="text" 
+                       id="birthtime" 
+                       class="field-input" 
+                       placeholder="ЧЧ:ММ"
+                       maxlength="5">
+                <div class="field-hint">Если не знаете точное время, оставьте пустым</div>
             </div>
 
+            <!-- Место рождения -->
             <div class="field">
-                <div class="field-label">Ваш пол:</div>
+                <label class="field-label required">Место рождения</label>
+                <input type="text" 
+                       id="birthplace" 
+                       class="field-input" 
+                       placeholder="Город, страна"
+                       maxlength="100"
+                       required>
+                <div class="field-error" id="birthplaceError">Укажите место рождения</div>
+            </div>
+
+            <!-- Пол -->
+            <div class="field">
+                <label class="field-label required">Ваш пол</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="gender" value="male" checked>
-                        <span>Мужчина</span>
+                        <input type="radio" name="gender" value="male" required>
+                        <span>👨 Мужчина</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="gender" value="female">
-                        <span>Женщина</span>
+                        <input type="radio" name="gender" value="female" required>
+                        <span>👩 Женщина</span>
                     </label>
                 </div>
+                <div class="field-error" id="genderError">Укажите ваш пол</div>
             </div>
 
-            <div class="divider"></div>
+            <!-- Статус сообщение -->
+            <div id="statusMessage" class="status"></div>
 
-            <!-- Кнопки для разных способов отправки -->
-            <button type="button" class="submit-btn" id="sendToN8nBtn">📤 Отправить в n8n</button>
-            <button type="button" class="submit-btn secondary" id="sendToTelegramBtn">📱 Отправить в Telegram (старый способ)</button>
-            
-            <div id="statusMessage" class="status-message"></div>
-            
-            <!-- Панель отладки -->
-            <div class="debug-panel" id="debugPanel">
-                <div><strong>📋 Лог отладки:</strong></div>
-                <div id="logMessages">Ожидание действий...</div>
-            </div>
+            <!-- Кнопка отправки -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span id="btnText">Получить прогноз</span>
+            </button>
         </form>
     </div>
 
     <script>
-        const webApp = window.Telegram.WebApp;
-        webApp.ready();
-        webApp.expand();
+        (function() {
+            'use strict';
 
-        // ⚠️ СЮДА ВСТАВЬТЕ ВАШ РЕАЛЬНЫЙ URL ИЗ n8n
-        const N8N_WEBHOOK_URL = 'https://nx8.zaltrix.org/webhook-test/telegram-form';
-        
-        // Для теста можно использовать этот публичный тестовый эндпоинт (просто чтобы проверить отправку)
-        // const TEST_URL = 'https://webhook.site/#!/ваш-уникальный-id'; // замените на свой с webhook.site
+            // Инициализация Telegram Web App
+            const webApp = window.Telegram.WebApp;
+            webApp.ready();
+            webApp.expand();
+            webApp.enableClosingConfirmation(); // Спрашивать подтверждение при закрытии
 
-        const debugPanel = document.getElementById('debugPanel');
-        const logMessages = document.getElementById('logMessages');
-        const statusMessage = document.getElementById('statusMessage');
-
-        // Функция для логирования
-        function log(message, data = null) {
-            const timestamp = new Date().toLocaleTimeString();
-            let logText = `[${timestamp}] ${message}`;
-            if (data) {
-                logText += `\n${JSON.stringify(data, null, 2)}`;
-            }
-            
-            // Добавляем в панель отладки
-            const newLog = document.createElement('div');
-            newLog.textContent = logText;
-            debugPanel.appendChild(newLog);
-            debugPanel.scrollTop = debugPanel.scrollHeight;
-            
-            // Также пишем в консоль
-            console.log(logText, data);
-        }
-
-        function showStatus(message, isSuccess) {
-            statusMessage.textContent = message;
-            statusMessage.className = 'status-message ' + (isSuccess ? 'status-success' : 'status-error');
-            log(`Статус: ${message}`, {isSuccess});
-        }
-
-        // Функция сбора данных из формы
-        function getFormData() {
-            const genderElement = document.querySelector('input[name="gender"]:checked');
-            
-            return {
-                name: document.getElementById('name').value,
-                birthday: document.getElementById('birthday').value,
-                birthplace: document.getElementById('birthplace').value,
-                gender: genderElement ? (genderElement.value === 'male' ? 'Мужчина' : 'Женщина') : 'не указан',
-                user_id: webApp.initDataUnsafe.user?.id || 'unknown',
-                username: webApp.initDataUnsafe.user?.username || 'не указан',
-                chat_id: webApp.initDataUnsafe.user?.id,
-                source: 'telegram_web_app',
-                timestamp: new Date().toISOString()
+            // Конфигурация
+            const CONFIG = {
+                // ⚠️ ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ URL
+                WEBHOOK_URL: 'https://nx8.zaltrix.org/webhook/telegram-form',
+                RETRY_ATTEMPTS: 1,      // Количество попыток при ошибке
+                TIMEOUT_MS: 10000        // Таймаут запроса (10 секунд)
             };
-        }
 
-        // Отправка в n8n
-        async function sendToN8n() {
-            const formData = getFormData();
-            
-            log('🚀 Начинаем отправку в n8n...', formData);
-            log('URL вебхука:', N8N_WEBHOOK_URL);
-            
-            showStatus('Отправка в n8n...', true);
-
-            try {
-                log('📡 Выполняем fetch запрос...');
+            // DOM элементы
+            const elements = {
+                form: document.getElementById('astroForm'),
+                submitBtn: document.getElementById('submitBtn'),
+                btnText: document.getElementById('btnText'),
+                status: document.getElementById('statusMessage'),
                 
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
+                name: document.getElementById('name'),
+                birthday: document.getElementById('birthday'),
+                birthtime: document.getElementById('birthtime'),
+                birthplace: document.getElementById('birthplace'),
+                
+                nameError: document.getElementById('nameError'),
+                birthdayError: document.getElementById('birthdayError'),
+                birthplaceError: document.getElementById('birthplaceError'),
+                genderError: document.getElementById('genderError')
+            };
+
+            // Состояние формы
+            let isSubmitting = false;
+
+            // Валидация полей
+            function validateForm() {
+                let isValid = true;
+
+                // Сброс ошибок
+                document.querySelectorAll('.field-error').forEach(el => {
+                    el.classList.remove('visible');
+                });
+                document.querySelectorAll('.field-input').forEach(el => {
+                    el.classList.remove('error');
                 });
 
-                log('📥 Получен ответ от сервера', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    ok: response.ok
-                });
-
-                if (response.ok) {
-                    const responseText = await response.text();
-                    log('✅ Успех! Ответ сервера:', responseText);
-                    showStatus('✅ Данные отправлены в n8n!', true);
-                    
-                    // Можно закрыть через 2 секунды
-                    setTimeout(() => webApp.close(), 2000);
-                } else {
-                    const errorText = await response.text();
-                    log('❌ Ошибка сервера:', {status: response.status, error: errorText});
-                    showStatus(`❌ Ошибка ${response.status}`, false);
+                // Имя
+                if (!elements.name.value.trim()) {
+                    elements.name.classList.add('error');
+                    elements.nameError.classList.add('visible');
+                    isValid = false;
                 }
-            } catch (error) {
-                log('❌ Критическая ошибка при отправке:', {
-                    name: error.name,
-                    message: error.message,
-                    stack: error.stack
-                });
-                showStatus(`❌ Ошибка: ${error.message}`, false);
-            }
-        }
 
-        // Отправка в Telegram (старый способ, для проверки)
-        function sendToTelegram() {
-            const formData = getFormData();
-            
-            log('📱 Отправка в Telegram (sendData)...', formData);
-            showStatus('Отправка в Telegram...', true);
-            
-            try {
-                webApp.sendData(JSON.stringify(formData));
-                log('✅ sendData выполнен успешно');
-                showStatus('✅ Данные отправлены в Telegram!', true);
+                // Дата рождения
+                const datePattern = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.(19|20)\d\d$/;
+                if (!datePattern.test(elements.birthday.value)) {
+                    elements.birthday.classList.add('error');
+                    elements.birthdayError.classList.add('visible');
+                    isValid = false;
+                }
+
+                // Место рождения
+                if (!elements.birthplace.value.trim()) {
+                    elements.birthplace.classList.add('error');
+                    elements.birthplaceError.classList.add('visible');
+                    isValid = false;
+                }
+
+                // Пол
+                if (!document.querySelector('input[name="gender"]:checked')) {
+                    elements.genderError.classList.add('visible');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            // Форматирование даты
+            function formatDateInput(value) {
+                const numbers = value.replace(/\D/g, '');
+                if (numbers.length <= 2) return numbers;
+                if (numbers.length <= 4) return numbers.slice(0, 2) + '.' + numbers.slice(2);
+                return numbers.slice(0, 2) + '.' + numbers.slice(2, 4) + '.' + numbers.slice(4, 8);
+            }
+
+            // Форматирование времени
+            function formatTimeInput(value) {
+                const numbers = value.replace(/\D/g, '');
+                if (numbers.length <= 2) return numbers;
+                return numbers.slice(0, 2) + ':' + numbers.slice(2, 4);
+            }
+
+            // Обработчики форматирования
+            elements.birthday.addEventListener('input', (e) => {
+                e.target.value = formatDateInput(e.target.value);
+            });
+
+            elements.birthtime.addEventListener('input', (e) => {
+                e.target.value = formatTimeInput(e.target.value);
+            });
+
+            // Валидация при потере фокуса
+            elements.name.addEventListener('blur', validateForm);
+            elements.birthday.addEventListener('blur', validateForm);
+            elements.birthplace.addEventListener('blur', validateForm);
+
+            // Показать статус
+            function showStatus(message, type = 'info') {
+                elements.status.className = 'status ' + type;
+                elements.status.textContent = message;
+            }
+
+            // Очистить статус
+            function clearStatus() {
+                elements.status.className = 'status';
+                elements.status.textContent = '';
+            }
+
+            // Установка состояния загрузки
+            function setLoading(loading) {
+                isSubmitting = loading;
+                elements.submitBtn.disabled = loading;
+                elements.btnText.innerHTML = loading ? 
+                    '<span class="spinner"></span>Отправка...' : 
+                    'Получить прогноз';
+            }
+
+            // Получить данные формы
+            function getFormData() {
+                const genderInput = document.querySelector('input[name="gender"]:checked');
                 
-                setTimeout(() => webApp.close(), 1500);
-            } catch (error) {
-                log('❌ Ошибка sendData:', error);
-                showStatus('❌ Ошибка отправки в Telegram', false);
+                return {
+                    name: elements.name.value.trim(),
+                    birthday: elements.birthday.value,
+                    birthtime: elements.birthtime.value || null,
+                    birthplace: elements.birthplace.value.trim(),
+                    gender: genderInput ? (genderInput.value === 'male' ? 'Мужчина' : 'Женщина') : null,
+                    user_id: webApp.initDataUnsafe.user?.id || null,
+                    username: webApp.initDataUnsafe.user?.username || null,
+                    chat_id: webApp.initDataUnsafe.user?.id,  // Важно для ответа!
+                    source: 'telegram_web_app',
+                    timestamp: new Date().toISOString(),
+                    user_data: webApp.initDataUnsafe.user || null
+                };
             }
-        }
 
-        // Тестовая функция для проверки доступности n8n
-        async function testN8nConnection() {
-            log('🔄 Проверка доступности n8n...');
-            
-            try {
-                // Пробуем сделать OPTIONS запрос для проверки CORS
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: 'OPTIONS'
-                });
-                
-                log('✅ n8n доступен, CORS:', {
-                    status: response.status,
-                    headers: Object.fromEntries(response.headers.entries())
-                });
-            } catch (error) {
-                log('❌ n8n НЕ доступен:', error.message);
+            // Отправка данных в n8n с retry
+            async function sendToWebhook(data, attempt = 1) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
+
+                    const response = await fetch(CONFIG.WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const responseData = await response.text();
+                    return { success: true, data: responseData };
+
+                } catch (error) {
+                    if (attempt < CONFIG.RETRY_ATTEMPTS) {
+                        // Пробуем еще раз через 1 секунду
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        return sendToWebhook(data, attempt + 1);
+                    }
+                    return { success: false, error: error.message };
+                }
             }
-        }
 
-        // Навешиваем обработчики
-        document.getElementById('sendToN8nBtn').addEventListener('click', sendToN8n);
-        document.getElementById('sendToTelegramBtn').addEventListener('click', sendToTelegram);
+            // Обработка отправки формы
+            elements.form.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-        // Логируем информацию о запуске
-        log('✅ Web App инициализирован');
-        log('👤 Данные пользователя:', webApp.initDataUnsafe.user);
-        log('🔗 URL для n8n:', N8N_WEBHOOK_URL);
+                // Предотвращаем двойную отправку
+                if (isSubmitting) return;
 
-        // Проверяем доступность n8n
-        setTimeout(testN8nConnection, 1000);
+                // Валидация
+                if (!validateForm()) {
+                    showStatus('Пожалуйста, исправьте ошибки в форме', 'error');
+                    
+                    // Прокрутка к первой ошибке
+                    const firstError = document.querySelector('.field-error.visible');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return;
+                }
 
+                // Собираем данные
+                const formData = getFormData();
+
+                // Отправляем
+                setLoading(true);
+                showStatus('Отправка данных...', 'info');
+
+                try {
+                    const result = await sendToWebhook(formData);
+
+                    if (result.success) {
+                        showStatus('✅ Данные успешно отправлены! Спасибо!', 'success');
+                        
+                        // Блокируем форму
+                        elements.form.querySelectorAll('input, button').forEach(el => {
+                            el.disabled = true;
+                        });
+                        
+                        // Отправляем событие в Telegram и закрываем через 2 секунды
+                        setTimeout(() => {
+                            webApp.close();
+                        }, 2000);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Submission error:', error);
+                    showStatus(`❌ Ошибка: ${error.message || 'Не удалось отправить данные'}`, 'error');
+                    setLoading(false);
+                }
+            });
+
+            // Предупреждение при попытке закрыть с несохраненными данными
+            window.addEventListener('beforeunload', (e) => {
+                if (!isSubmitting && elements.name.value.trim()) {
+                    e.preventDefault();
+                    return '';
+                }
+            });
+
+            // Логируем успешный запуск
+            console.log('✅ Form initialized', {
+                user: webApp.initDataUnsafe.user,
+                webhook: CONFIG.WEBHOOK_URL
+            });
+
+        })();
     </script>
 </body>
 </html>
