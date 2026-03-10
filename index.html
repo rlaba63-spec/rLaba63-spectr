@@ -74,6 +74,39 @@
         .submit-btn.secondary {
             background-color: #666;
         }
+        .submit-btn.warning {
+            background-color: #ff9800;
+        }
+        .webhook-status {
+            padding: 8px 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .webhook-status.primary {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+        }
+        .webhook-status.test {
+            background-color: #fff3e0;
+            border: 1px solid #ff9800;
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-indicator.active {
+            background-color: #4caf50;
+        }
+        .status-indicator.inactive {
+            background-color: #f44336;
+        }
         .divider {
             height: 1px;
             background-color: var(--tg-theme-hint-color, #eeeeee);
@@ -112,6 +145,11 @@
             color: white;
             display: block;
         }
+        .status-info {
+            background-color: #2196f3;
+            color: white;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -121,8 +159,24 @@
             Заполните данные для тестирования отправки
         </div>
 
+        <!-- Индикатор статуса вебхуков -->
+        <div id="primaryWebhookStatus" class="webhook-status primary">
+            <span>
+                <span class="status-indicator" id="primaryIndicator"></span>
+                Основной вебхук
+            </span>
+            <span id="primaryStatusText">Проверка...</span>
+        </div>
+        <div id="testWebhookStatus" class="webhook-status test">
+            <span>
+                <span class="status-indicator" id="testIndicator"></span>
+                Тестовый вебхук
+            </span>
+            <span id="testStatusText">Проверка...</span>
+        </div>
+
         <form id="astroForm">
-            <!-- Поля формы как в предыдущей версии -->
+            <!-- Поля формы -->
             <div class="field">
                 <div class="field-label">Ваше имя:</div>
                 <input type="text" id="name" class="field-input" value="Тест" required>
@@ -155,8 +209,9 @@
             <div class="divider"></div>
 
             <!-- Кнопки для разных способов отправки -->
-            <button type="button" class="submit-btn" id="sendToN8nBtn">📤 Отправить в n8n</button>
-            <button type="button" class="submit-btn secondary" id="sendToTelegramBtn">📱 Отправить в Telegram (старый способ)</button>
+            <button type="button" class="submit-btn" id="sendToN8nBtn">📤 Отправить в n8n (с авто-переключением)</button>
+            <button type="button" class="submit-btn secondary" id="sendToTelegramBtn">📱 Отправить в Telegram</button>
+            <button type="button" class="submit-btn warning" id="forceSwitchBtn">🔄 Принудительно переключить на тестовый</button>
             
             <div id="statusMessage" class="status-message"></div>
             
@@ -173,14 +228,22 @@
         webApp.ready();
         webApp.expand();
 
-        // ⚠️ СЮДА ВСТАВЬТЕ ВАШ РЕАЛЬНЫЙ URL ИЗ n8n
-        const N8N_WEBHOOK_URL = 'https://nx8.zaltrix.org/webhook-test/telegram-form';
-        
-        // Для теста можно использовать этот публичный тестовый эндпоинт (просто чтобы проверить отправку)
-        // const TEST_URL = 'https://webhook.site/#!/ваш-уникальный-id'; // замените на свой с webhook.site
+        // ⚠️ НАСТРОЙКА ВЕБХУКОВ
+        const WEBHOOKS = {
+            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',  // Основной вебхук
+            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'  // Тестовый вебхук
+        };
 
+        // Текущий активный вебхук (начинаем с основного)
+        let currentWebhook = WEBHOOKS.primary;
+        let usingTestWebhook = false;
+
+        // Элементы для отображения статуса
+        const primaryIndicator = document.getElementById('primaryIndicator');
+        const testIndicator = document.getElementById('testIndicator');
+        const primaryStatusText = document.getElementById('primaryStatusText');
+        const testStatusText = document.getElementById('testStatusText');
         const debugPanel = document.getElementById('debugPanel');
-        const logMessages = document.getElementById('logMessages');
         const statusMessage = document.getElementById('statusMessage');
 
         // Функция для логирования
@@ -191,20 +254,97 @@
                 logText += `\n${JSON.stringify(data, null, 2)}`;
             }
             
-            // Добавляем в панель отладки
             const newLog = document.createElement('div');
             newLog.textContent = logText;
             debugPanel.appendChild(newLog);
             debugPanel.scrollTop = debugPanel.scrollHeight;
             
-            // Также пишем в консоль
             console.log(logText, data);
         }
 
-        function showStatus(message, isSuccess) {
+        function showStatus(message, type) {
             statusMessage.textContent = message;
-            statusMessage.className = 'status-message ' + (isSuccess ? 'status-success' : 'status-error');
-            log(`Статус: ${message}`, {isSuccess});
+            statusMessage.className = 'status-message status-' + type;
+            log(`Статус: ${message}`, {type});
+        }
+
+        // Функция проверки доступности вебхука
+        async function checkWebhookHealth(url, timeout = 3000) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                const response = await fetch(url, {
+                    method: 'HEAD',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                return response.status < 500; // Считаем доступным если нет серверной ошибки
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Обновление статуса вебхуков
+        async function updateWebhookStatus() {
+            log('🔄 Проверка доступности вебхуков...');
+            
+            const [primaryHealthy, testHealthy] = await Promise.all([
+                checkWebhookHealth(WEBHOOKS.primary),
+                checkWebhookHealth(WEBHOOKS.test)
+            ]);
+
+            // Обновляем индикаторы основного вебхука
+            primaryIndicator.className = `status-indicator ${primaryHealthy ? 'active' : 'inactive'}`;
+            primaryStatusText.textContent = primaryHealthy ? 'Доступен' : 'Недоступен';
+
+            // Обновляем индикаторы тестового вебхука
+            testIndicator.className = `status-indicator ${testHealthy ? 'active' : 'inactive'}`;
+            testStatusText.textContent = testHealthy ? 'Доступен' : 'Недоступен';
+
+            // Автоматическое переключение на тестовый если основной недоступен
+            if (!primaryHealthy && testHealthy && !usingTestWebhook) {
+                log('⚠️ Основной вебхук недоступен, переключаемся на тестовый');
+                switchToTestWebhook();
+            } else if (primaryHealthy && usingTestWebhook) {
+                log('✅ Основной вебхук снова доступен, переключаемся обратно');
+                switchToPrimaryWebhook();
+            }
+
+            log('📊 Статус вебхуков:', {
+                primary: primaryHealthy ? 'доступен' : 'недоступен',
+                test: testHealthy ? 'доступен' : 'недоступен',
+                current: usingTestWebhook ? 'тестовый' : 'основной'
+            });
+
+            return { primaryHealthy, testHealthy };
+        }
+
+        // Переключение на тестовый вебхук
+        function switchToTestWebhook() {
+            currentWebhook = WEBHOOKS.test;
+            usingTestWebhook = true;
+            
+            // Визуальное выделение активного вебхука
+            document.getElementById('primaryWebhookStatus').style.opacity = '0.5';
+            document.getElementById('testWebhookStatus').style.opacity = '1';
+            
+            showStatus('🔄 Переключено на ТЕСТОВЫЙ вебхук', 'info');
+            log('🔄 Активный вебхук: ТЕСТОВЫЙ');
+        }
+
+        // Переключение на основной вебхук
+        function switchToPrimaryWebhook() {
+            currentWebhook = WEBHOOKS.primary;
+            usingTestWebhook = false;
+            
+            // Визуальное выделение активного вебхука
+            document.getElementById('primaryWebhookStatus').style.opacity = '1';
+            document.getElementById('testWebhookStatus').style.opacity = '0.5';
+            
+            showStatus('🔄 Переключено на ОСНОВНОЙ вебхук', 'info');
+            log('🔄 Активный вебхук: ОСНОВНОЙ');
         }
 
         // Функция сбора данных из формы
@@ -220,23 +360,25 @@
                 username: webApp.initDataUnsafe.user?.username || 'не указан',
                 chat_id: webApp.initDataUnsafe.user?.id,
                 source: 'telegram_web_app',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                used_webhook: usingTestWebhook ? 'test' : 'primary' // Отмечаем какой вебхук использован
             };
         }
 
-        // Отправка в n8n
+        // Отправка в n8n с автоматическим переключением
         async function sendToN8n() {
             const formData = getFormData();
             
-            log('🚀 Начинаем отправку в n8n...', formData);
-            log('URL вебхука:', N8N_WEBHOOK_URL);
+            log('🚀 Начинаем отправку...', formData);
+            log('🔗 Текущий вебхук:', currentWebhook);
             
-            showStatus('Отправка в n8n...', true);
+            showStatus('Отправка...', 'info');
 
             try {
-                log('📡 Выполняем fetch запрос...');
+                // Сначала пробуем отправить на текущий вебхук
+                log('📡 Отправка на текущий вебхук...');
                 
-                const response = await fetch(N8N_WEBHOOK_URL, {
+                const response = await fetch(currentWebhook, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -247,80 +389,118 @@
                 log('📥 Получен ответ от сервера', {
                     status: response.status,
                     statusText: response.statusText,
-                    ok: response.ok
+                    ok: response.ok,
+                    webhook: usingTestWebhook ? 'test' : 'primary'
                 });
 
                 if (response.ok) {
                     const responseText = await response.text();
                     log('✅ Успех! Ответ сервера:', responseText);
-                    showStatus('✅ Данные отправлены в n8n!', true);
+                    showStatus('✅ Данные отправлены!', 'success');
                     
-                    // Можно закрыть через 2 секунды
                     setTimeout(() => webApp.close(), 2000);
                 } else {
-                    const errorText = await response.text();
-                    log('❌ Ошибка сервера:', {status: response.status, error: errorText});
-                    showStatus(`❌ Ошибка ${response.status}`, false);
+                    // Если текущий вебхук вернул ошибку, пробуем переключиться
+                    if (!usingTestWebhook) {
+                        log('⚠️ Ошибка на основном вебхуке, пробуем тестовый...');
+                        switchToTestWebhook();
+                        
+                        // Повторная отправка на тестовый
+                        const retryResponse = await fetch(currentWebhook, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (retryResponse.ok) {
+                            const responseText = await retryResponse.text();
+                            log('✅ Успех на тестовом вебхуке!', responseText);
+                            showStatus('✅ Данные отправлены через тестовый вебхук!', 'success');
+                        } else {
+                            throw new Error(`Ошибка ${retryResponse.status}`);
+                        }
+                    } else {
+                        throw new Error(`Ошибка ${response.status}`);
+                    }
                 }
             } catch (error) {
                 log('❌ Критическая ошибка при отправке:', {
                     name: error.name,
-                    message: error.message,
-                    stack: error.stack
+                    message: error.message
                 });
-                showStatus(`❌ Ошибка: ${error.message}`, false);
+                
+                // Если ошибка и мы ещё не пробовали тестовый
+                if (!usingTestWebhook) {
+                    log('⚠️ Пробуем переключиться на тестовый вебхук...');
+                    switchToTestWebhook();
+                    
+                    // Пробуем отправить ещё раз
+                    try {
+                        const retryResponse = await fetch(currentWebhook, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (retryResponse.ok) {
+                            const responseText = await retryResponse.text();
+                            log('✅ Успех на тестовом вебхуке после ошибки!', responseText);
+                            showStatus('✅ Данные отправлены через тестовый вебхук!', 'success');
+                            return;
+                        }
+                    } catch (retryError) {
+                        log('❌ И тестовый вебхук недоступен', retryError);
+                    }
+                }
+                
+                showStatus(`❌ Ошибка: ${error.message}`, 'error');
             }
         }
 
-        // Отправка в Telegram (старый способ, для проверки)
+        // Отправка в Telegram (старый способ)
         function sendToTelegram() {
             const formData = getFormData();
             
             log('📱 Отправка в Telegram (sendData)...', formData);
-            showStatus('Отправка в Telegram...', true);
+            showStatus('Отправка в Telegram...', 'info');
             
             try {
                 webApp.sendData(JSON.stringify(formData));
                 log('✅ sendData выполнен успешно');
-                showStatus('✅ Данные отправлены в Telegram!', true);
+                showStatus('✅ Данные отправлены в Telegram!', 'success');
                 
                 setTimeout(() => webApp.close(), 1500);
             } catch (error) {
                 log('❌ Ошибка sendData:', error);
-                showStatus('❌ Ошибка отправки в Telegram', false);
-            }
-        }
-
-        // Тестовая функция для проверки доступности n8n
-        async function testN8nConnection() {
-            log('🔄 Проверка доступности n8n...');
-            
-            try {
-                // Пробуем сделать OPTIONS запрос для проверки CORS
-                const response = await fetch(N8N_WEBHOOK_URL, {
-                    method: 'OPTIONS'
-                });
-                
-                log('✅ n8n доступен, CORS:', {
-                    status: response.status,
-                    headers: Object.fromEntries(response.headers.entries())
-                });
-            } catch (error) {
-                log('❌ n8n НЕ доступен:', error.message);
+                showStatus('❌ Ошибка отправки в Telegram', 'error');
             }
         }
 
         // Навешиваем обработчики
         document.getElementById('sendToN8nBtn').addEventListener('click', sendToN8n);
         document.getElementById('sendToTelegramBtn').addEventListener('click', sendToTelegram);
+        document.getElementById('forceSwitchBtn').addEventListener('click', () => {
+            if (usingTestWebhook) {
+                switchToPrimaryWebhook();
+            } else {
+                switchToTestWebhook();
+            }
+            updateWebhookStatus();
+        });
 
         // Логируем информацию о запуске
         log('✅ Web App инициализирован');
         log('👤 Данные пользователя:', webApp.initDataUnsafe.user);
-        log('🔗 URL для n8n:', N8N_WEBHOOK_URL);
+        log('🔗 Основной вебхук:', WEBHOOKS.primary);
+        log('🔗 Тестовый вебхук:', WEBHOOKS.test);
 
-        // Проверяем доступность n8n
-        setTimeout(testN8nConnection, 1000);
+        // Периодическая проверка статуса вебхуков
+        updateWebhookStatus();
+        setInterval(updateWebhookStatus, 30000); // Проверка каждые 30 секунд
 
     </script>
 </body>
