@@ -6,6 +6,7 @@
     <title>Астроконсультант - Анкета</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Ваши стили остаются без изменений */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--tg-theme-bg-color, #ffffff);
@@ -92,12 +93,32 @@
         .submit-btn:hover {
             opacity: 0.9;
         }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .divider {
             height: 1px;
             background-color: var(--tg-theme-hint-color, #eeeeee);
             margin: 24px 0;
         }
-        /* Стили для темной темы Telegram */
+        .status-message {
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status-success {
+            background-color: #4caf50;
+            color: white;
+            display: block;
+        }
+        .status-error {
+            background-color: #f44336;
+            color: white;
+            display: block;
+        }
         @media (prefers-color-scheme: dark) {
             .field-input {
                 border-color: #404040;
@@ -157,56 +178,134 @@
             <div class="divider"></div>
 
             <button type="submit" class="submit-btn" id="submitBtn">Отправить</button>
+            <div id="statusMessage" class="status-message"></div>
         </form>
     </div>
 
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
-        webApp.expand(); // Раскрываем Web App на весь экран
+        webApp.expand();
+
+        // ⚠️ ВАЖНО: ЗАМЕНИТЕ НА СВОЙ URL ВЕБХУКА ИЗ n8n
+        const N8N_WEBHOOK_URL = 'https://ваш-инстанс.n8n.cloud/webhook/ваш-путь';
+        
+        // Для тестирования локально через ngrok можно использовать:
+        // const N8N_WEBHOOK_URL = 'https://ваш-туннель.ngrok.io/webhook/путь';
 
         const form = document.getElementById('astroForm');
         const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
 
-        form.addEventListener('submit', function(e) {
+        // Функция для отображения статуса
+        function showStatus(message, isSuccess) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + (isSuccess ? 'status-success' : 'status-error');
+        }
+
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            // Проверяем, не отправляется ли уже форма
+            if (submitBtn.disabled) {
+                return;
+            }
+
             // Собираем данные формы
+            const genderElement = document.querySelector('input[name="gender"]:checked');
+            
+            if (!genderElement) {
+                showStatus('Пожалуйста, укажите ваш пол', false);
+                return;
+            }
+
             const formData = {
                 name: document.getElementById('name').value,
                 birthday: document.getElementById('birthday').value,
                 birthtime: document.getElementById('birthtime').value || 'не указано',
                 birthplace: document.getElementById('birthplace').value,
-                gender: document.querySelector('input[name="gender"]:checked').value === 'male' ? 'Мужчина' : 'Женщина',
+                gender: genderElement.value === 'male' ? 'Мужчина' : 'Женщина',
                 user_id: webApp.initDataUnsafe.user?.id || 'unknown',
-                username: webApp.initDataUnsafe.user?.username || 'не указан'
+                username: webApp.initDataUnsafe.user?.username || 'не указан',
+                chat_id: webApp.initDataUnsafe.user?.id, // Для отправки ответа
+                source: 'telegram_web_app'
             };
 
             // Базовая валидация
             if (!formData.name || !formData.birthday || !formData.birthplace) {
-                webApp.showAlert('Пожалуйста, заполните все обязательные поля');
+                showStatus('Пожалуйста, заполните все обязательные поля', false);
                 return;
             }
 
             // Проверка формата даты
             const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
             if (!datePattern.test(formData.birthday)) {
-                webApp.showAlert('Дата рождения должна быть в формате ДД.ММ.ГГГГ');
+                showStatus('Дата рождения должна быть в формате ДД.ММ.ГГГГ', false);
                 return;
             }
 
-            // Отправляем данные обратно в бота
-            webApp.sendData(JSON.stringify(formData));
-            
-            // Показываем сообщение об успехе
-            submitBtn.textContent = 'Отправлено! ✓';
-            submitBtn.style.opacity = '0.8';
+            // Блокируем кнопку
             submitBtn.disabled = true;
-            
-            // Закрываем Web App через 1.5 секунды
-            setTimeout(() => {
-                webApp.close();
-            }, 1500);
+            submitBtn.textContent = 'Отправка...';
+            showStatus('Отправка данных...', true);
+
+            try {
+                console.log('Отправка данных в n8n:', formData);
+                console.log('URL вебхука:', N8N_WEBHOOK_URL);
+
+                // Отправляем данные в n8n через fetch
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Статус ответа:', response.status);
+
+                if (response.ok) {
+                    // Пробуем прочитать ответ
+                    let responseData;
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        responseData = await response.json();
+                    } else {
+                        responseData = await response.text();
+                    }
+                    
+                    console.log('Ответ от n8n:', responseData);
+                    
+                    // Успех!
+                    showStatus('✅ Данные успешно отправлены!', true);
+                    submitBtn.textContent = 'Отправлено! ✓';
+                    
+                    // Отправляем также в Telegram для надежности (опционально)
+                    // webApp.sendData(JSON.stringify({status: 'sent_to_n8n', ...formData}));
+                    
+                    // Закрываем через 2 секунды
+                    setTimeout(() => {
+                        webApp.close();
+                    }, 2000);
+                } else {
+                    // Ошибка от сервера
+                    const errorText = await response.text();
+                    console.error('Ошибка сервера:', response.status, errorText);
+                    showStatus(`❌ Ошибка ${response.status}: ${errorText || 'Неизвестная ошибка'}`, false);
+                    
+                    // Разблокируем кнопку
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Отправить';
+                }
+            } catch (error) {
+                // Сетевая ошибка
+                console.error('Ошибка при отправке:', error);
+                showStatus(`❌ Ошибка: ${error.message}. Проверьте подключение к интернету`, false);
+                
+                // Разблокируем кнопку
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Отправить';
+            }
         });
 
         // Автоматическое форматирование даты
@@ -228,6 +327,10 @@
             }
             e.target.value = value;
         });
+
+        // Добавляем обработчик для отладки
+        console.log('Web App инициализирован');
+        console.log('Данные пользователя:', webApp.initDataUnsafe.user);
     </script>
 </body>
 </html>
