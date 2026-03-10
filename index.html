@@ -27,7 +27,7 @@
         .container {
             max-width: 480px;
             margin: 0 auto;
-            padding: 20px 16px;
+            padding: 24px 20px;
             width: 100%;
             flex: 1;
         }
@@ -36,113 +36,58 @@
         .header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e9ecef);
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
         .header-icon {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
-        }
-
-        .header-title {
-            flex: 1;
+            font-size: 28px;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
         }
 
         .header-title h1 {
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             margin-bottom: 4px;
-            color: var(--tg-theme-text-color, #000000);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .header-title p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--tg-theme-hint-color, #6c757d);
         }
 
-        /* Status Banner */
-        .status-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-banner.test-mode {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .status-banner-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .status-banner-content {
-            flex: 1;
-        }
-
-        .status-banner-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .status-banner-text {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        /* Form Sections */
-        .form-section {
+        /* Form Card */
+        .form-card {
             background-color: var(--tg-theme-secondary-bg-color, #f8f9fa);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--tg-theme-text-color, #000000);
+        .form-row .form-field {
+            flex: 1;
+            margin-bottom: 0;
         }
 
-        .section-title span {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-        }
-
-        /* Form Fields */
         .form-field {
             margin-bottom: 20px;
         }
@@ -152,41 +97,36 @@
         }
 
         .field-label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             color: var(--tg-theme-text-color, #000000);
-        }
-
-        .field-label i {
-            color: #dc3545;
-            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .required-star {
             color: #dc3545;
-            margin-left: 4px;
+            font-size: 14px;
         }
 
         .field-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px;
             border: 2px solid transparent;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 16px;
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .field-input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
         .field-input.error {
@@ -200,13 +140,13 @@
 
         /* Radio Group */
         .radio-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 12px;
             margin-top: 4px;
         }
 
         .radio-option {
+            flex: 1;
             position: relative;
         }
 
@@ -222,14 +162,15 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 14px;
+            padding: 16px;
             background-color: var(--tg-theme-bg-color, #ffffff);
             border: 2px solid transparent;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .radio-option input[type="radio"]:checked + .radio-label {
@@ -239,10 +180,6 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-        .radio-option input[type="radio"]:focus + .radio-label {
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-        }
-
         /* Submit Button */
         .submit-btn {
             width: 100%;
@@ -250,18 +187,21 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 20px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.5);
         }
 
         .submit-btn:active:not(:disabled) {
@@ -273,109 +213,6 @@
             cursor: not-allowed;
         }
 
-        .submit-btn.test-mode {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
-        }
-
-        /* Error Message */
-        .error-message {
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 6px;
-            display: none;
-        }
-
-        .error-message.visible {
-            display: block;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 16px;
-            right: 16px;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 16px;
-            border-radius: 16px;
-            background: white;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .toast.show {
-            display: flex;
-        }
-
-        .toast.success {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-        }
-
-        .toast.error {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            color: white;
-        }
-
-        .toast.warning {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-        }
-
-        .toast-icon {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .toast-content {
-            flex: 1;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .toast-close {
-            width: 28px;
-            height: 28px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: background 0.3s ease;
-        }
-
-        .toast-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Loading Spinner */
         .spinner {
             width: 20px;
             height: 20px;
@@ -384,54 +221,50 @@
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
             display: inline-block;
-            margin-right: 8px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        /* Error Message */
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 6px;
+            margin-left: 4px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        /* Hint */
+        .hint {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #6c757d);
+            margin-top: 4px;
+            margin-left: 4px;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
-            margin-top: 32px;
-            padding-top: 16px;
-            border-top: 1px solid var(--tg-theme-section-separator-color, #e9ecef);
+            margin-top: 24px;
             font-size: 13px;
             color: var(--tg-theme-hint-color, #6c757d);
         }
 
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            margin-left: 4px;
-            cursor: help;
+        /* Success Animation */
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 8px;
-            border-radius: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-            font-weight: normal;
-            pointer-events: none;
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
+        .success-icon {
+            animation: checkmark 0.5s ease;
         }
     </style>
 </head>
@@ -446,83 +279,75 @@
             </div>
         </div>
 
-        <!-- Status Banner (динамический) -->
-        <div class="status-banner" id="statusBanner">
-            <div class="status-banner-icon" id="statusIcon">✅</div>
-            <div class="status-banner-content">
-                <div class="status-banner-title" id="statusTitle">Система работает в штатном режиме</div>
-                <div class="status-banner-text" id="statusText">Основной канал связи активен</div>
-            </div>
-        </div>
-
         <!-- Main Form -->
         <form id="astroForm" novalidate>
-            <!-- Personal Information Section -->
-            <div class="form-section">
-                <div class="section-title">
-                    <span>1</span>
-                    Личная информация
-                </div>
-
+            <div class="form-card">
+                <!-- Имя -->
                 <div class="form-field">
                     <div class="field-label">
                         Ваше имя
                         <span class="required-star">*</span>
-                        <div class="tooltip">
-                            ⓘ
-                            <span class="tooltip-text">Введите ваше полное имя</span>
-                        </div>
                     </div>
                     <input 
                         type="text" 
                         id="name" 
                         class="field-input" 
-                        placeholder="Например: Александр"
+                        placeholder="Александр"
                         required
                         maxlength="50"
                     >
-                    <div class="error-message" id="nameError">Пожалуйста, укажите ваше имя</div>
+                    <div class="error-message" id="nameError">Укажите ваше имя</div>
                 </div>
 
-                <div class="form-field">
-                    <div class="field-label">
-                        Дата рождения
-                        <span class="required-star">*</span>
-                        <div class="tooltip">
-                            ⓘ
-                            <span class="tooltip-text">Формат: ДД.ММ.ГГГГ</span>
+                <!-- Дата и время в одной строке -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <div class="field-label">
+                            Дата рождения
+                            <span class="required-star">*</span>
                         </div>
+                        <input 
+                            type="text" 
+                            id="birthday" 
+                            class="field-input" 
+                            placeholder="ДД.ММ.ГГГГ"
+                            required
+                        >
+                        <div class="hint">Форматы: 01.01.1990, 01/01/1990</div>
+                        <div class="error-message" id="birthdayError">Укажите дату рождения</div>
                     </div>
-                    <input 
-                        type="text" 
-                        id="birthday" 
-                        class="field-input" 
-                        placeholder="ДД.ММ.ГГГГ"
-                        required
-                        pattern="\d{2}\.\d{2}\.\d{4}"
-                    >
-                    <div class="error-message" id="birthdayError">Введите дату в формате ДД.ММ.ГГГГ</div>
+
+                    <div class="form-field">
+                        <div class="field-label">
+                            Время
+                        </div>
+                        <input 
+                            type="text" 
+                            id="birthtime" 
+                            class="field-input" 
+                            placeholder="ЧЧ:ММ"
+                        >
+                        <div class="hint">Если знаете точное время</div>
+                    </div>
                 </div>
 
+                <!-- Место рождения -->
                 <div class="form-field">
                     <div class="field-label">
                         Место рождения
                         <span class="required-star">*</span>
-                        <div class="tooltip">
-                            ⓘ
-                            <span class="tooltip-text">Город или населенный пункт</span>
-                        </div>
                     </div>
                     <input 
                         type="text" 
                         id="birthplace" 
                         class="field-input" 
-                        placeholder="Например: Москва"
+                        placeholder="Москва"
                         required
                     >
                     <div class="error-message" id="birthplaceError">Укажите место рождения</div>
                 </div>
 
+                <!-- Пол -->
                 <div class="form-field">
                     <div class="field-label">
                         Пол
@@ -541,73 +366,28 @@
                 </div>
             </div>
 
-            <!-- Additional Information Section (опционально) -->
-            <div class="form-section">
-                <div class="section-title">
-                    <span>2</span>
-                    Дополнительная информация
-                </div>
-
-                <div class="form-field">
-                    <div class="field-label">
-                        Время рождения
-                        <div class="tooltip">
-                            ⓘ
-                            <span class="tooltip-text">Если знаете точное время</span>
-                        </div>
-                    </div>
-                    <input 
-                        type="text" 
-                        id="birthtime" 
-                        class="field-input" 
-                        placeholder="ЧЧ:ММ (например: 14:30)"
-                        pattern="\d{2}:\d{2}"
-                    >
-                </div>
-
-                <div class="form-field">
-                    <div class="field-label">
-                        Email для ответа
-                    </div>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="field-input" 
-                        placeholder="example@mail.com"
-                    >
-                </div>
-            </div>
-
             <!-- Submit Button -->
             <button type="submit" class="submit-btn" id="submitBtn">
                 <span class="btn-text">Получить консультацию</span>
                 <span class="spinner" style="display: none;"></span>
             </button>
 
-            <!-- Agreement Text -->
+            <!-- Footer -->
             <div class="footer">
-                Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
+                Нажимая кнопку, вы соглашаетесь с обработкой данных
             </div>
         </form>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <div class="toast-icon" id="toastIcon">✅</div>
-        <div class="toast-content" id="toastMessage"></div>
-        <button class="toast-close" onclick="hideToast()">✕</button>
     </div>
 
     <script>
         const webApp = window.Telegram.WebApp;
         webApp.ready();
         webApp.expand();
-        webApp.enableClosingConfirmation();
 
-        // Конфигурация вебхуков
+        // Конфигурация вебхуков (пользователь их не видит)
         const WEBHOOKS = {
-            primary: 'https://ваш-сервер.com/webhook/telegram-form',  // Замените на ваш основной URL
-            test: 'https://ваш-сервер.com/webhook-test/telegram-form'  // Замените на ваш тестовый URL
+            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',  // Продакшн
+            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'  // Тестовый для fallback
         };
 
         // Состояние приложения
@@ -620,72 +400,120 @@
         const submitBtn = document.getElementById('submitBtn');
         const btnText = submitBtn.querySelector('.btn-text');
         const spinner = submitBtn.querySelector('.spinner');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
-        const toastIcon = document.getElementById('toastIcon');
-        const statusBanner = document.getElementById('statusBanner');
-        const statusIcon = document.getElementById('statusIcon');
-        const statusTitle = document.getElementById('statusTitle');
-        const statusText = document.getElementById('statusText');
 
-        // Валидация полей
+        // Парсинг даты из различных форматов
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            
+            // Убираем лишние пробелы
+            dateStr = dateStr.trim();
+            
+            // Пробуем разные разделители
+            let parts = [];
+            if (dateStr.includes('.')) {
+                parts = dateStr.split('.');
+            } else if (dateStr.includes('/')) {
+                parts = dateStr.split('/');
+            } else if (dateStr.includes('-')) {
+                parts = dateStr.split('-');
+            } else {
+                return null;
+            }
+            
+            if (parts.length !== 3) return null;
+            
+            let [day, month, year] = parts.map(p => parseInt(p, 10));
+            
+            // Проверяем корректность
+            if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+            
+            // Нормализуем год
+            if (year < 100) {
+                year += year > 30 ? 1900 : 2000;
+            }
+            
+            // Проверяем, что дата существует
+            const date = new Date(year, month - 1, day);
+            if (date.getDate() !== day || 
+                date.getMonth() !== month - 1 || 
+                date.getFullYear() !== year) {
+                return null;
+            }
+            
+            // Проверяем разумные границы
+            const currentYear = new Date().getFullYear();
+            if (year < 1900 || year > currentYear) return null;
+            
+            return {
+                day: day.toString().padStart(2, '0'),
+                month: month.toString().padStart(2, '0'),
+                year: year.toString()
+            };
+        }
+
+        // Парсинг времени
+        function parseTime(timeStr) {
+            if (!timeStr) return null;
+            
+            timeStr = timeStr.trim();
+            let parts = [];
+            
+            if (timeStr.includes(':')) {
+                parts = timeStr.split(':');
+            } else if (timeStr.includes('.')) {
+                parts = timeStr.split('.');
+            } else {
+                return null;
+            }
+            
+            if (parts.length !== 2) return null;
+            
+            let [hours, minutes] = parts.map(p => parseInt(p, 10));
+            
+            if (isNaN(hours) || isNaN(minutes)) return null;
+            if (hours < 0 || hours > 23) return null;
+            if (minutes < 0 || minutes > 59) return null;
+            
+            return {
+                hours: hours.toString().padStart(2, '0'),
+                minutes: minutes.toString().padStart(2, '0')
+            };
+        }
+
+        // Валидация поля
         function validateField(field) {
             const errorElement = document.getElementById(`${field.id}Error`);
             if (!errorElement) return true;
 
             let isValid = true;
-            let errorMessage = '';
 
-            switch(field.id) {
-                case 'name':
-                    isValid = field.value.trim().length >= 2;
-                    errorMessage = 'Имя должно содержать минимум 2 символа';
-                    break;
-                case 'birthday':
-                    const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
-                    isValid = datePattern.test(field.value);
-                    if (isValid) {
-                        const [day, month, year] = field.value.split('.').map(Number);
-                        const date = new Date(year, month - 1, day);
-                        isValid = date.getDate() === day && 
-                                 date.getMonth() === month - 1 && 
-                                 date.getFullYear() === year &&
-                                 year >= 1900 && 
-                                 year <= new Date().getFullYear();
-                    }
-                    errorMessage = 'Введите корректную дату рождения';
-                    break;
-                case 'birthplace':
-                    isValid = field.value.trim().length >= 2;
-                    errorMessage = 'Введите место рождения';
-                    break;
-                case 'birthtime':
-                    if (field.value) {
-                        const timePattern = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
-                        isValid = timePattern.test(field.value);
-                        errorMessage = 'Введите время в формате ЧЧ:ММ';
-                    }
-                    break;
-                case 'email':
-                    if (field.value) {
-                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        isValid = emailPattern.test(field.value);
-                        errorMessage = 'Введите корректный email';
-                    }
-                    break;
+            if (field.required && !field.value.trim()) {
+                isValid = false;
+            } else if (field.value.trim()) {
+                switch(field.id) {
+                    case 'name':
+                        isValid = field.value.trim().length >= 2;
+                        break;
+                    case 'birthday':
+                        isValid = parseDate(field.value) !== null;
+                        break;
+                    case 'birthtime':
+                        if (field.value.trim()) {
+                            isValid = parseTime(field.value) !== null;
+                        }
+                        break;
+                    case 'birthplace':
+                        isValid = field.value.trim().length >= 2;
+                        break;
+                }
             }
 
-            if (!isValid && field.value) {
+            if (!isValid) {
                 field.classList.add('error');
-                if (errorElement) {
-                    errorElement.textContent = errorMessage;
-                    errorElement.classList.add('visible');
-                }
+                errorElement.classList.add('visible');
             } else {
                 field.classList.remove('error');
-                if (errorElement) {
-                    errorElement.classList.remove('visible');
-                }
+                errorElement.classList.remove('visible');
             }
 
             return isValid;
@@ -693,23 +521,27 @@
 
         // Валидация всей формы
         function validateForm() {
-            const fields = ['name', 'birthday', 'birthplace', 'birthtime', 'email'];
+            const fields = ['name', 'birthday', 'birthplace'];
             let isValid = true;
 
             fields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
-                if (field && field.required) {
-                    if (!validateField(field)) {
-                        isValid = false;
-                    }
+                if (!validateField(field)) {
+                    isValid = false;
                 }
             });
+
+            // Время не обязательно, но если заполнено - проверяем
+            const timeField = document.getElementById('birthtime');
+            if (timeField.value.trim() && !validateField(timeField)) {
+                isValid = false;
+            }
 
             return isValid;
         }
 
         // Добавляем обработчики валидации
-        ['name', 'birthday', 'birthplace', 'birthtime', 'email'].forEach(fieldId => {
+        ['name', 'birthday', 'birthplace', 'birthtime'].forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
                 field.addEventListener('input', () => validateField(field));
@@ -717,127 +549,112 @@
             }
         });
 
-        // Проверка доступности вебхука
+        // Проверка доступности вебхука (тихая, пользователь не видит)
         async function checkWebhookHealth(url) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                setTimeout(() => controller.abort(), 2000);
                 
-                const response = await fetch(url, {
-                    method: 'HEAD',
+                await fetch(url, { 
+                    method: 'HEAD', 
                     signal: controller.signal,
-                    mode: 'no-cors' // Для кросс-доменных запросов
+                    mode: 'no-cors'
                 });
-                
-                clearTimeout(timeoutId);
-                return true; // Считаем доступным если нет ошибки
-            } catch (error) {
+                return true;
+            } catch {
                 return false;
             }
         }
 
-        // Обновление статуса вебхуков
-        async function updateWebhookStatus() {
-            const [primaryHealthy, testHealthy] = await Promise.all([
-                checkWebhookHealth(WEBHOOKS.primary),
-                checkWebhookHealth(WEBHOOKS.test)
-            ]);
+        // Тихая проверка статуса вебхуков
+        async function checkWebhooksStatus() {
+            try {
+                const [primaryHealthy] = await Promise.all([
+                    checkWebhookHealth(WEBHOOKS.primary)
+                ]);
 
-            // Автоматическое переключение при недоступности основного
-            if (!primaryHealthy && testHealthy && !usingTestWebhook) {
-                switchToTestWebhook('автоматически');
-            } else if (primaryHealthy && usingTestWebhook) {
-                switchToPrimaryWebhook('автоматически');
-            }
-
-            // Обновление статус-банера
-            updateStatusBanner(primaryHealthy, testHealthy);
-        }
-
-        // Переключение на тестовый вебхук
-        function switchToTestWebhook(reason = 'вручную') {
-            currentWebhook = WEBHOOKS.test;
-            usingTestWebhook = true;
-            
-            statusBanner.classList.add('test-mode');
-            submitBtn.classList.add('test-mode');
-            
-            showToast(`🔄 Переключено на тестовый режим (${reason})`, 'warning');
-        }
-
-        // Переключение на основной вебхук
-        function switchToPrimaryWebhook(reason = 'вручную') {
-            currentWebhook = WEBHOOKS.primary;
-            usingTestWebhook = false;
-            
-            statusBanner.classList.remove('test-mode');
-            submitBtn.classList.remove('test-mode');
-            
-            showToast(`✅ Основной канал восстановлен (${reason})`, 'success');
-        }
-
-        // Обновление статус-банера
-        function updateStatusBanner(primaryHealthy, testHealthy) {
-            if (usingTestWebhook) {
-                statusBanner.className = 'status-banner test-mode';
-                statusIcon.textContent = '⚠️';
-                statusTitle.textContent = 'Тестовый режим';
-                statusText.textContent = 'Используется резервный канал связи';
-            } else if (!primaryHealthy) {
-                statusBanner.className = 'status-banner';
-                statusIcon.textContent = '🔴';
-                statusTitle.textContent = 'Проблемы с подключением';
-                statusText.textContent = 'Основной канал временно недоступен';
-            } else {
-                statusBanner.className = 'status-banner';
-                statusIcon.textContent = '✅';
-                statusTitle.textContent = 'Система работает в штатном режиме';
-                statusText.textContent = 'Основной канал связи активен';
+                // Если продакшн недоступен, переключаемся на тестовый
+                if (!primaryHealthy && !usingTestWebhook) {
+                    console.log('⚠️ Production webhook unavailable, switching to test');
+                    currentWebhook = WEBHOOKS.test;
+                    usingTestWebhook = true;
+                } 
+                // Если продакшн снова доступен, переключаемся обратно
+                else if (primaryHealthy && usingTestWebhook) {
+                    console.log('✅ Production webhook restored, switching back');
+                    currentWebhook = WEBHOOKS.primary;
+                    usingTestWebhook = false;
+                }
+            } catch (error) {
+                console.error('Health check error:', error);
             }
         }
 
         // Сбор данных формы
         function getFormData() {
             const genderElement = document.querySelector('input[name="gender"]:checked');
-            const gender = genderElement ? (genderElement.value === 'male' ? 'male' : 'female') : 'unspecified';
+            const birthday = parseDate(document.getElementById('birthday').value);
+            const birthtime = parseTime(document.getElementById('birthtime').value);
             
+            // Форматируем дату в единый формат для отправки
+            let formattedDate = null;
+            if (birthday) {
+                formattedDate = `${birthday.year}-${birthday.month}-${birthday.day}`;
+            }
+
+            let formattedTime = null;
+            if (birthtime) {
+                formattedTime = `${birthtime.hours}:${birthtime.minutes}`;
+            }
+
             return {
-                // Основные поля
                 name: document.getElementById('name').value.trim(),
-                birth_date: document.getElementById('birthday').value.trim(),
+                birth_date: formattedDate,
+                birth_time: formattedTime,
                 birth_place: document.getElementById('birthplace').value.trim(),
-                gender: gender,
-                
-                // Опциональные поля
-                birth_time: document.getElementById('birthtime').value.trim() || null,
-                email: document.getElementById('email').value.trim() || null,
-                
-                // Технические поля
+                gender: genderElement ? genderElement.value : 'unspecified',
                 user_id: webApp.initDataUnsafe.user?.id || null,
                 username: webApp.initDataUnsafe.user?.username || null,
-                language: webApp.initDataUnsafe.user?.language_code || 'ru',
-                
-                // Метаданные
                 source: 'telegram_mini_app',
-                timestamp: new Date().toISOString(),
-                webhook_mode: usingTestWebhook ? 'test' : 'production',
-                app_version: '1.0.0',
-                
-                // Данные Telegram
-                telegram_data: webApp.initData || null,
-                platform: webApp.platform || 'unknown'
+                timestamp: new Date().toISOString()
             };
         }
 
-        // Отправка данных
+        // Показать сообщение об ошибке (только при реальных проблемах)
+        function showError(message) {
+            // Создаем временное уведомление (можно заменить на более красивое)
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                left: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+                color: white;
+                padding: 16px;
+                border-radius: 16px;
+                text-align: center;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideUp 0.3s ease;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Отправка формы
         async function submitForm(event) {
             event.preventDefault();
 
             if (isSubmitting) return;
 
-            // Валидация
             if (!validateForm()) {
-                showToast('Пожалуйста, заполните все обязательные поля', 'error');
                 return;
             }
 
@@ -850,7 +667,10 @@
             const formData = getFormData();
 
             try {
-                // Пробуем отправить на текущий вебхук
+                // Проверяем статус вебхуков перед отправкой
+                await checkWebhooksStatus();
+
+                // Пробуем отправить
                 let response = await fetch(currentWebhook, {
                     method: 'POST',
                     headers: {
@@ -859,11 +679,11 @@
                     body: JSON.stringify(formData)
                 });
 
-                // Если текущий вебхук недоступен и это основной, пробуем тестовый
+                // Если ошибка и мы на продакшне, пробуем тестовый
                 if (!response.ok && !usingTestWebhook) {
-                    showToast('Основной канал недоступен, пробуем резервный...', 'warning');
-                    
-                    switchToTestWebhook('автоматически после ошибки');
+                    console.log('Production failed, trying test webhook');
+                    currentWebhook = WEBHOOKS.test;
+                    usingTestWebhook = true;
                     
                     response = await fetch(currentWebhook, {
                         method: 'POST',
@@ -875,62 +695,29 @@
                 }
 
                 if (response.ok) {
-                    showToast('Данные успешно отправлены! Ожидайте консультацию.', 'success');
+                    // Успешная отправка
+                    btnText.innerHTML = '✓ Отправлено!';
+                    btnText.style.display = 'inline';
+                    spinner.style.display = 'none';
                     
                     // Отправляем данные в Telegram
                     webApp.sendData(JSON.stringify({
                         ...formData,
-                        submitted: true,
-                        timestamp: new Date().toISOString()
+                        status: 'success'
                     }));
                     
-                    // Закрываем через 2 секунды
-                    setTimeout(() => {
-                        webApp.close();
-                    }, 2000);
+                    // Закрываем через секунду
+                    setTimeout(() => webApp.close(), 1000);
                 } else {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error('Server error');
                 }
 
             } catch (error) {
                 console.error('Submission error:', error);
                 
-                // Если не пробовали тестовый, пробуем его
-                if (!usingTestWebhook) {
-                    showToast('Ошибка отправки, пробуем резервный канал...', 'warning');
-                    
-                    switchToTestWebhook('автоматически после ошибки');
-                    
-                    try {
-                        const retryResponse = await fetch(currentWebhook, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(formData)
-                        });
-
-                        if (retryResponse.ok) {
-                            showToast('Данные отправлены через резервный канал!', 'success');
-                            
-                            webApp.sendData(JSON.stringify({
-                                ...formData,
-                                submitted: true,
-                                used_fallback: true,
-                                timestamp: new Date().toISOString()
-                            }));
-                            
-                            setTimeout(() => webApp.close(), 2000);
-                        } else {
-                            throw new Error('Резервный канал также недоступен');
-                        }
-                    } catch (retryError) {
-                        showToast('Не удалось отправить данные. Попробуйте позже.', 'error');
-                    }
-                } else {
-                    showToast('Ошибка отправки. Проверьте подключение к интернету.', 'error');
-                }
-            } finally {
+                // Показываем сообщение об ошибке только если действительно не получилось
+                showError('Не удалось отправить данные. Проверьте подключение к интернету.');
+                
                 // Разблокируем кнопку
                 isSubmitting = false;
                 submitBtn.disabled = false;
@@ -939,58 +726,17 @@
             }
         }
 
-        // Показать уведомление
-        function showToast(message, type = 'info') {
-            toastMessage.textContent = message;
-            toast.className = `toast show ${type}`;
-            
-            switch(type) {
-                case 'success':
-                    toastIcon.textContent = '✅';
-                    break;
-                case 'error':
-                    toastIcon.textContent = '❌';
-                    break;
-                case 'warning':
-                    toastIcon.textContent = '⚠️';
-                    break;
-                default:
-                    toastIcon.textContent = 'ℹ️';
-            }
-
-            // Автоматически скрываем через 5 секунд
-            setTimeout(hideToast, 5000);
-        }
-
-        // Скрыть уведомление
-        function hideToast() {
-            toast.classList.remove('show');
-        }
-
         // Обработчик формы
         form.addEventListener('submit', submitForm);
 
-        // Инициализация
-        (async function init() {
-            // Логируем информацию о пользователе
-            console.log('Telegram WebApp initialized:', {
-                user: webApp.initDataUnsafe.user,
-                platform: webApp.platform,
-                version: webApp.version
-            });
+        // Фоновая проверка статуса (каждые 30 секунд)
+        setInterval(checkWebhooksStatus, 30000);
 
-            // Проверяем статус вебхуков
-            await updateWebhookStatus();
+        // Первоначальная проверка
+        checkWebhooksStatus();
 
-            // Периодическая проверка (каждые 30 секунд)
-            setInterval(updateWebhookStatus, 30000);
-
-            // Показываем приветственное сообщение
-            if (webApp.initDataUnsafe.user) {
-                const userName = webApp.initDataUnsafe.user.first_name;
-                showToast(`Добро пожаловать, ${userName}!`, 'info');
-            }
-        })();
+        // Логируем только для разработки
+        console.log('Form initialized with fallback support');
 
     </script>
 </body>
