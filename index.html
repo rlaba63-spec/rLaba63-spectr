@@ -319,7 +319,7 @@
 
                     <div class="form-field">
                         <div class="field-label">
-                            Время
+                            Время рождения
                         </div>
                         <input 
                             type="text" 
@@ -327,7 +327,7 @@
                             class="field-input" 
                             placeholder="ЧЧ:ММ"
                         >
-                        <div class="hint">Если знаете точное время</div>
+                        <div class="hint">Если не знаете оставьте пустым</div>
                     </div>
                 </div>
 
@@ -342,7 +342,6 @@
                         id="birthplace" 
                         class="field-input" 
                         placeholder="Москва"
-                        required
                     >
                     <div class="error-message" id="birthplaceError">Укажите место рождения</div>
                 </div>
@@ -355,7 +354,7 @@
                     </div>
                     <div class="radio-group">
                         <div class="radio-option">
-                            <input type="radio" name="gender" id="genderMale" value="male" checked>
+                            <input type="radio" name="gender" id="genderMale" value="male">
                             <label for="genderMale" class="radio-label">👨 Мужчина</label>
                         </div>
                         <div class="radio-option">
@@ -442,7 +441,7 @@
             
             // Проверяем разумные границы
             const currentYear = new Date().getFullYear();
-            if (year < 1900 || year > currentYear) return null;
+            if (year < 1800 || year > currentYear) return null;
             
             return {
                 day: day.toString().padStart(2, '0'),
@@ -706,8 +705,8 @@
                         status: 'success'
                     }));
                     
-                    // Закрываем через секунду
-                    setTimeout(() => webApp.close(), 1000);
+                    // Закрываем через 3 секунды
+                    setTimeout(() => webApp.close(), 3000);
                 } else {
                     throw new Error('Server error');
                 }
@@ -730,7 +729,7 @@
         form.addEventListener('submit', submitForm);
 
         // Фоновая проверка статуса (каждые 30 секунд)
-        setInterval(checkWebhooksStatus, 30000);
+        //setInterval(checkWebhooksStatus, 30000);
 
         // Первоначальная проверка
         checkWebhooksStatus();
