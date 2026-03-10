@@ -29,7 +29,6 @@
             flex: 1;
         }
 
-        /* Header */
         .header {
             margin-bottom: 24px;
         }
@@ -52,7 +51,6 @@
             border-bottom: 1px solid var(--tg-theme-hint-color, #e0e0e0);
         }
 
-        /* Form */
         .form {
             display: flex;
             flex-direction: column;
@@ -115,7 +113,6 @@
             display: block;
         }
 
-        /* Radio group */
         .radio-group {
             display: flex;
             gap: 20px;
@@ -142,7 +139,6 @@
             color: var(--tg-theme-text-color, #000000);
         }
 
-        /* Status messages */
         .status {
             margin: 20px 0;
             padding: 14px;
@@ -172,7 +168,34 @@
             display: block;
         }
 
-        /* Button */
+        .status.warning {
+            background: #ff9800;
+            color: white;
+            display: block;
+        }
+
+        .debug-panel {
+            margin-top: 30px;
+            padding: 16px;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 14px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .debug-panel.visible {
+            display: block;
+        }
+
+        .debug-panel div {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #ddd);
+            color: var(--tg-theme-text-color, #333);
+        }
+
         .submit-btn {
             width: 100%;
             padding: 18px;
@@ -191,16 +214,13 @@
         .submit-btn:hover:not(:disabled) {
             opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(64, 167, 227, 0.4);
         }
 
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            box-shadow: none;
         }
 
-        /* Loading spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -211,6 +231,23 @@
             animation: spin 1s ease-in-out infinite;
             margin-right: 8px;
             vertical-align: middle;
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .test-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         @keyframes spin {
@@ -227,19 +264,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* Dark theme adjustments */
-        @media (prefers-color-scheme: dark) {
-            .field-input {
-                border-color: #404040;
-            }
-            
-            .title {
-                background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-        }
     </style>
 </head>
 <body>
@@ -247,7 +271,7 @@
         <div class="header">
             <h1 class="title">Астроконсультант 🔮</h1>
             <div class="subtitle">
-                Заполните анкету для получения персонального астрологического прогноза
+                Заполните анкету для получения персонального прогноза
             </div>
         </div>
 
@@ -255,48 +279,22 @@
             <!-- Имя -->
             <div class="field">
                 <label class="field-label required">Ваше имя</label>
-                <input type="text" 
-                       id="name" 
-                       class="field-input" 
-                       placeholder="Введите ваше имя"
-                       maxlength="50"
-                       required>
+                <input type="text" id="name" class="field-input" placeholder="Введите ваше имя" value="Тест" required>
                 <div class="field-error" id="nameError">Пожалуйста, укажите ваше имя</div>
             </div>
 
             <!-- Дата рождения -->
             <div class="field">
                 <label class="field-label required">Дата рождения</label>
-                <input type="text" 
-                       id="birthday" 
-                       class="field-input" 
-                       placeholder="ДД.ММ.ГГГГ"
-                       maxlength="10"
-                       required>
-                <div class="field-hint">Формат: ДД.ММ.ГГГГ (например, 15.05.1985)</div>
+                <input type="text" id="birthday" class="field-input" placeholder="ДД.ММ.ГГГГ" value="01.01.1990" required>
+                <div class="field-hint">Формат: ДД.ММ.ГГГГ</div>
                 <div class="field-error" id="birthdayError">Введите дату в формате ДД.ММ.ГГГГ</div>
-            </div>
-
-            <!-- Время рождения (необязательно) -->
-            <div class="field">
-                <label class="field-label">Время рождения</label>
-                <input type="text" 
-                       id="birthtime" 
-                       class="field-input" 
-                       placeholder="ЧЧ:ММ"
-                       maxlength="5">
-                <div class="field-hint">Если не знаете точное время, оставьте пустым</div>
             </div>
 
             <!-- Место рождения -->
             <div class="field">
                 <label class="field-label required">Место рождения</label>
-                <input type="text" 
-                       id="birthplace" 
-                       class="field-input" 
-                       placeholder="Город, страна"
-                       maxlength="100"
-                       required>
+                <input type="text" id="birthplace" class="field-input" placeholder="Город, страна" value="Москва" required>
                 <div class="field-error" id="birthplaceError">Укажите место рождения</div>
             </div>
 
@@ -305,7 +303,7 @@
                 <label class="field-label required">Ваш пол</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="gender" value="male" required>
+                        <input type="radio" name="gender" value="male" checked required>
                         <span>👨 Мужчина</span>
                     </label>
                     <label class="radio-option">
@@ -316,8 +314,20 @@
                 <div class="field-error" id="genderError">Укажите ваш пол</div>
             </div>
 
-            <!-- Статус сообщение -->
+            <!-- Статус -->
             <div id="statusMessage" class="status"></div>
+
+            <!-- Кнопки тестирования -->
+            <div class="test-buttons">
+                <button type="button" class="test-btn" id="testWebhookBtn">🔍 Тест вебхука</button>
+                <button type="button" class="test-btn" id="testCorsBtn">🌐 Тест CORS</button>
+            </div>
+
+            <!-- Панель отладки -->
+            <div id="debugPanel" class="debug-panel">
+                <div><strong>📋 Лог отладки:</strong></div>
+                <div id="logMessages">Ожидание действий...</div>
+            </div>
 
             <!-- Кнопка отправки -->
             <button type="submit" class="submit-btn" id="submitBtn">
@@ -330,117 +340,59 @@
         (function() {
             'use strict';
 
-            // Инициализация Telegram Web App
             const webApp = window.Telegram.WebApp;
             webApp.ready();
             webApp.expand();
-            webApp.enableClosingConfirmation(); // Спрашивать подтверждение при закрытии
 
-            // Конфигурация
-            const CONFIG = {
-                // ⚠️ ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ URL
-                WEBHOOK_URL: 'https://nx8.zaltrix.org/webhook/telegram-form',
-                RETRY_ATTEMPTS: 1,      // Количество попыток при ошибке
-                TIMEOUT_MS: 10000        // Таймаут запроса (10 секунд)
+            // ⚠️ ВАШ URL ВЕБХУКА - УБЕДИТЕСЬ ЧТО ОН ПРАВИЛЬНЫЙ!
+            const WEBHOOK_URL = 'https://nx8.zaltrix.org/webhook/telegram-form';
+            
+            // Альтернативные URL для тестирования
+            const TEST_URLS = {
+                webhook: WEBHOOK_URL,
+                test: WEBHOOK_URL.replace('/webhook/', '/webhook-test/')
             };
 
-            // DOM элементы
             const elements = {
                 form: document.getElementById('astroForm'),
                 submitBtn: document.getElementById('submitBtn'),
                 btnText: document.getElementById('btnText'),
                 status: document.getElementById('statusMessage'),
+                debugPanel: document.getElementById('debugPanel'),
+                logMessages: document.getElementById('logMessages'),
+                testWebhookBtn: document.getElementById('testWebhookBtn'),
+                testCorsBtn: document.getElementById('testCorsBtn'),
                 
                 name: document.getElementById('name'),
                 birthday: document.getElementById('birthday'),
-                birthtime: document.getElementById('birthtime'),
-                birthplace: document.getElementById('birthplace'),
-                
-                nameError: document.getElementById('nameError'),
-                birthdayError: document.getElementById('birthdayError'),
-                birthplaceError: document.getElementById('birthplaceError'),
-                genderError: document.getElementById('genderError')
+                birthplace: document.getElementById('birthplace')
             };
 
-            // Состояние формы
             let isSubmitting = false;
 
-            // Валидация полей
-            function validateForm() {
-                let isValid = true;
-
-                // Сброс ошибок
-                document.querySelectorAll('.field-error').forEach(el => {
-                    el.classList.remove('visible');
-                });
-                document.querySelectorAll('.field-input').forEach(el => {
-                    el.classList.remove('error');
-                });
-
-                // Имя
-                if (!elements.name.value.trim()) {
-                    elements.name.classList.add('error');
-                    elements.nameError.classList.add('visible');
-                    isValid = false;
+            // Функция логирования
+            function log(message, data = null) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                
+                let logText = `[${timestamp}] ${message}`;
+                if (data) {
+                    logText += `\n${JSON.stringify(data, null, 2)}`;
                 }
-
-                // Дата рождения
-                const datePattern = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.(19|20)\d\d$/;
-                if (!datePattern.test(elements.birthday.value)) {
-                    elements.birthday.classList.add('error');
-                    elements.birthdayError.classList.add('visible');
-                    isValid = false;
-                }
-
-                // Место рождения
-                if (!elements.birthplace.value.trim()) {
-                    elements.birthplace.classList.add('error');
-                    elements.birthplaceError.classList.add('visible');
-                    isValid = false;
-                }
-
-                // Пол
-                if (!document.querySelector('input[name="gender"]:checked')) {
-                    elements.genderError.classList.add('visible');
-                    isValid = false;
-                }
-
-                return isValid;
+                
+                logEntry.textContent = logText;
+                elements.logMessages.appendChild(logEntry);
+                elements.debugPanel.classList.add('visible');
+                elements.debugPanel.scrollTop = elements.debugPanel.scrollHeight;
+                
+                console.log(logText, data);
             }
-
-            // Форматирование даты
-            function formatDateInput(value) {
-                const numbers = value.replace(/\D/g, '');
-                if (numbers.length <= 2) return numbers;
-                if (numbers.length <= 4) return numbers.slice(0, 2) + '.' + numbers.slice(2);
-                return numbers.slice(0, 2) + '.' + numbers.slice(2, 4) + '.' + numbers.slice(4, 8);
-            }
-
-            // Форматирование времени
-            function formatTimeInput(value) {
-                const numbers = value.replace(/\D/g, '');
-                if (numbers.length <= 2) return numbers;
-                return numbers.slice(0, 2) + ':' + numbers.slice(2, 4);
-            }
-
-            // Обработчики форматирования
-            elements.birthday.addEventListener('input', (e) => {
-                e.target.value = formatDateInput(e.target.value);
-            });
-
-            elements.birthtime.addEventListener('input', (e) => {
-                e.target.value = formatTimeInput(e.target.value);
-            });
-
-            // Валидация при потере фокуса
-            elements.name.addEventListener('blur', validateForm);
-            elements.birthday.addEventListener('blur', validateForm);
-            elements.birthplace.addEventListener('blur', validateForm);
 
             // Показать статус
             function showStatus(message, type = 'info') {
                 elements.status.className = 'status ' + type;
                 elements.status.textContent = message;
+                log(`Статус: ${message}`, {type});
             }
 
             // Очистить статус
@@ -449,7 +401,7 @@
                 elements.status.textContent = '';
             }
 
-            // Установка состояния загрузки
+            // Установка загрузки
             function setLoading(loading) {
                 isSubmitting = loading;
                 elements.submitBtn.disabled = loading;
@@ -465,26 +417,61 @@
                 return {
                     name: elements.name.value.trim(),
                     birthday: elements.birthday.value,
-                    birthtime: elements.birthtime.value || null,
                     birthplace: elements.birthplace.value.trim(),
                     gender: genderInput ? (genderInput.value === 'male' ? 'Мужчина' : 'Женщина') : null,
                     user_id: webApp.initDataUnsafe.user?.id || null,
                     username: webApp.initDataUnsafe.user?.username || null,
-                    chat_id: webApp.initDataUnsafe.user?.id,  // Важно для ответа!
+                    chat_id: webApp.initDataUnsafe.user?.id,
                     source: 'telegram_web_app',
-                    timestamp: new Date().toISOString(),
-                    user_data: webApp.initDataUnsafe.user || null
+                    timestamp: new Date().toISOString()
                 };
             }
 
-            // Отправка данных в n8n с retry
-            async function sendToWebhook(data, attempt = 1) {
+            // Функция проверки доступности вебхука (CORS preflight)
+            async function testWebhookAvailability(url) {
+                log(`🔄 Проверка доступности: ${url}`);
+                
+                try {
+                    // Пробуем OPTIONS запрос для проверки CORS
+                    const response = await fetch(url, {
+                        method: 'OPTIONS',
+                        mode: 'cors',
+                        headers: {
+                            'Origin': 'https://telegram.org',
+                            'Access-Control-Request-Method': 'POST',
+                            'Access-Control-Request-Headers': 'content-type'
+                        }
+                    });
+                    
+                    log('✅ Сервер доступен, CORS headers:', {
+                        status: response.status,
+                        headers: Object.fromEntries(response.headers.entries())
+                    });
+                    
+                    return true;
+                } catch (error) {
+                    log('❌ Сервер НЕ доступен:', {
+                        error: error.message,
+                        name: error.name
+                    });
+                    return false;
+                }
+            }
+
+            // Функция отправки данных
+            async function sendData(url, data) {
+                log('🚀 Начинаем отправку...', {url, data});
+
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
+                    const timeoutId = setTimeout(() => {
+                        controller.abort();
+                        log('⏱️ Таймаут запроса (10 сек)');
+                    }, 10000);
 
-                    const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    const response = await fetch(url, {
                         method: 'POST',
+                        mode: 'cors',
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -494,87 +481,155 @@
 
                     clearTimeout(timeoutId);
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    log('📥 Получен ответ:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok,
+                        headers: Object.fromEntries(response.headers.entries())
+                    });
+
+                    if (response.ok) {
+                        const responseText = await response.text();
+                        log('✅ Успех! Ответ:', responseText);
+                        return { success: true, data: responseText };
+                    } else {
+                        const errorText = await response.text();
+                        log('❌ Ошибка сервера:', {status: response.status, error: errorText});
+                        return { success: false, error: `HTTP ${response.status}: ${errorText}` };
                     }
 
-                    const responseData = await response.text();
-                    return { success: true, data: responseData };
-
                 } catch (error) {
-                    if (attempt < CONFIG.RETRY_ATTEMPTS) {
-                        // Пробуем еще раз через 1 секунду
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        return sendToWebhook(data, attempt + 1);
+                    log('❌ Критическая ошибка:', {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack
+                    });
+                    
+                    if (error.name === 'AbortError') {
+                        return { success: false, error: 'Таймаут запроса' };
+                    }
+                    if (error.name === 'TypeError' && error.message === 'Load failed') {
+                        return { success: false, error: 'Load failed - сервер не отвечает или CORS блокировка' };
                     }
                     return { success: false, error: error.message };
                 }
             }
 
-            // Обработка отправки формы
+            // Тест вебхука
+            async function runWebhookTest() {
+                clearStatus();
+                log('🧪 ЗАПУСК ТЕСТА ВЕБХУКА');
+                
+                // Сначала проверяем доступность
+                const isAvailable = await testWebhookAvailability(WEBHOOK_URL);
+                
+                if (!isAvailable) {
+                    showStatus('❌ Сервер недоступен. Проверьте URL и CORS', 'error');
+                    return;
+                }
+                
+                // Отправляем тестовые данные
+                const testData = {
+                    test: true,
+                    message: 'Тестовый запрос',
+                    timestamp: new Date().toISOString()
+                };
+                
+                const result = await sendData(WEBHOOK_URL, testData);
+                
+                if (result.success) {
+                    showStatus('✅ Тест успешен! Сервер отвечает', 'success');
+                } else {
+                    showStatus(`❌ Тест не удался: ${result.error}`, 'error');
+                }
+            }
+
+            // Тест CORS
+            async function runCorsTest() {
+                clearStatus();
+                log('🌐 ТЕСТ CORS');
+                
+                try {
+                    const response = await fetch('https://cors-test.codehappy.dev/test', {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    
+                    log('✅ CORS работает:', {
+                        status: response.status,
+                        ok: response.ok
+                    });
+                    
+                    showStatus('✅ CORS работает нормально', 'success');
+                } catch (error) {
+                    log('❌ Проблемы с CORS:', error.message);
+                    showStatus('❌ Возможны проблемы с CORS', 'error');
+                }
+            }
+
+            // Основная отправка формы
             elements.form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Предотвращаем двойную отправку
                 if (isSubmitting) return;
 
-                // Валидация
-                if (!validateForm()) {
-                    showStatus('Пожалуйста, исправьте ошибки в форме', 'error');
-                    
-                    // Прокрутка к первой ошибке
-                    const firstError = document.querySelector('.field-error.visible');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    return;
-                }
-
-                // Собираем данные
                 const formData = getFormData();
+                log('📝 Форма заполнена', formData);
 
-                // Отправляем
                 setLoading(true);
                 showStatus('Отправка данных...', 'info');
 
-                try {
-                    const result = await sendToWebhook(formData);
+                const result = await sendData(WEBHOOK_URL, formData);
 
-                    if (result.success) {
-                        showStatus('✅ Данные успешно отправлены! Спасибо!', 'success');
-                        
-                        // Блокируем форму
-                        elements.form.querySelectorAll('input, button').forEach(el => {
-                            el.disabled = true;
-                        });
-                        
-                        // Отправляем событие в Telegram и закрываем через 2 секунды
-                        setTimeout(() => {
-                            webApp.close();
-                        }, 2000);
-                    } else {
-                        throw new Error(result.error);
+                if (result.success) {
+                    showStatus('✅ Данные успешно отправлены!', 'success');
+                    
+                    // Блокируем форму
+                    elements.form.querySelectorAll('input, button').forEach(el => {
+                        el.disabled = true;
+                    });
+                    
+                    // Отправляем в Telegram для надежности
+                    try {
+                        webApp.sendData(JSON.stringify({status: 'success', ...formData}));
+                        log('📱 Данные продублированы в Telegram');
+                    } catch (e) {
+                        log('⚠️ Не удалось отправить в Telegram');
                     }
-                } catch (error) {
-                    console.error('Submission error:', error);
-                    showStatus(`❌ Ошибка: ${error.message || 'Не удалось отправить данные'}`, 'error');
+                    
+                    setTimeout(() => webApp.close(), 2000);
+                } else {
+                    showStatus(`❌ Ошибка: ${result.error}`, 'error');
                     setLoading(false);
                 }
             });
 
-            // Предупреждение при попытке закрыть с несохраненными данными
-            window.addEventListener('beforeunload', (e) => {
-                if (!isSubmitting && elements.name.value.trim()) {
-                    e.preventDefault();
-                    return '';
+            // Кнопки тестирования
+            elements.testWebhookBtn.addEventListener('click', runWebhookTest);
+            elements.testCorsBtn.addEventListener('click', runCorsTest);
+
+            // Автоформатирование даты
+            elements.birthday.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/[^\d]/g, '');
+                if (value.length >= 2 && value.length < 4) {
+                    value = value.slice(0, 2) + '.' + value.slice(2);
+                } else if (value.length >= 4) {
+                    value = value.slice(0, 2) + '.' + value.slice(2, 4) + '.' + value.slice(4, 8);
                 }
+                e.target.value = value;
             });
 
-            // Логируем успешный запуск
-            console.log('✅ Form initialized', {
+            // Логируем запуск
+            log('✅ Форма загружена', {
                 user: webApp.initDataUnsafe.user,
-                webhook: CONFIG.WEBHOOK_URL
+                webhook: WEBHOOK_URL,
+                platform: webApp.platform
             });
+
+            // Автоматический тест при загрузке
+            setTimeout(() => {
+                testWebhookAvailability(WEBHOOK_URL);
+            }, 1000);
 
         })();
     </script>
