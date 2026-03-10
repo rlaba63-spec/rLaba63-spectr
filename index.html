@@ -19,17 +19,12 @@
             margin: 0;
             padding: 0;
             line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .container {
             max-width: 480px;
             margin: 0 auto;
             padding: 24px 20px;
-            width: 100%;
-            flex: 1;
         }
 
         .header {
@@ -90,10 +85,6 @@
             margin-bottom: 20px;
         }
 
-        .form-field:last-child {
-            margin-bottom: 0;
-        }
-
         .field-label {
             font-size: 15px;
             font-weight: 600;
@@ -129,11 +120,6 @@
 
         .field-input.error {
             border-color: #dc3545;
-        }
-
-        .field-input::placeholder {
-            color: var(--tg-theme-hint-color, #adb5bd);
-            opacity: 0.7;
         }
 
         .radio-group {
@@ -195,15 +181,6 @@
             gap: 10px;
         }
 
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.5);
-        }
-
-        .submit-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -254,8 +231,6 @@
             bottom: 24px;
             left: 20px;
             right: 20px;
-            background: #333;
-            color: white;
             padding: 16px;
             border-radius: 16px;
             text-align: center;
@@ -264,6 +239,7 @@
             animation: slideUp 0.3s ease;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             display: none;
+            color: white;
         }
 
         .toast.show {
@@ -282,6 +258,10 @@
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
         }
 
+        .toast.info {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        }
+
         @keyframes slideUp {
             from {
                 transform: translateY(100%);
@@ -290,17 +270,6 @@
             to {
                 transform: translateY(0);
                 opacity: 1;
-            }
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(100%);
-                opacity: 0;
             }
         }
     </style>
@@ -328,7 +297,6 @@
                         class="field-input" 
                         placeholder="Александр"
                         required
-                        maxlength="50"
                         value="Тест"
                     >
                     <div class="error-message" id="nameError">Укажите ваше имя</div>
@@ -425,8 +393,6 @@
         };
 
         let isSubmitting = false;
-        let retryCount = 0;
-        const MAX_RETRIES = 2;
 
         const form = document.getElementById('astroForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -434,7 +400,7 @@
         const spinner = submitBtn.querySelector('.spinner');
         const toast = document.getElementById('toast');
 
-        function showToast(message, type = 'error') {
+        function showToast(message, type = 'info') {
             toast.textContent = message;
             toast.className = `toast show ${type}`;
             
@@ -579,9 +545,10 @@
             }
         });
 
-        async function sendWithRetry(url, data, isTest = false) {
+        async function sendToWebhook(url, data, description) {
             try {
-                console.log(`Sending to ${isTest ? 'TEST' : 'PRODUCTION'} webhook:`, url);
+                console.log(`📤 Отправка на ${description}:`, url);
+                console.log('📦 Данные:', data);
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -592,27 +559,32 @@
                     body: JSON.stringify(data)
                 });
 
-                console.log('Response status:', response.status);
+                console.log(`📥 Статус ответа от ${description}:`, response.status);
                 
-                // Пробуем прочитать ответ
                 let responseData;
                 const contentType = response.headers.get('content-type');
+                
                 if (contentType && contentType.includes('application/json')) {
                     responseData = await response.json();
                 } else {
                     responseData = await response.text();
                 }
                 
-                console.log('Response data:', responseData);
+                console.log(`📄 Ответ от ${description}:`, responseData);
 
-                if (response.ok) {
-                    return { success: true, data: responseData };
-                } else {
-                    return { success: false, error: `HTTP ${response.status}`, status: response.status };
-                }
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: responseData,
+                    error: !response.ok ? (responseData.message || responseData || `HTTP ${response.status}`) : null
+                };
             } catch (error) {
-                console.log(`Error sending to ${url}:`, error.message);
-                return { success: false, error: error.message };
+                console.log(`❌ Ошибка при отправке на ${description}:`, error.message);
+                return {
+                    success: false,
+                    error: error.message,
+                    data: null
+                };
             }
         }
 
@@ -632,32 +604,38 @@
             spinner.style.display = 'inline-block';
 
             const birthday = parseDate(document.getElementById('birthday').value);
-            const birthtime = parseTime(document.getElementById('birthtime').value);
             
             const formData = {
+                // Основные данные
                 name: document.getElementById('name').value.trim(),
                 birth_date: birthday ? `${birthday.year}-${birthday.month}-${birthday.day}` : null,
-                birth_time: birthtime ? `${birthtime.hours}:${birthtime.minutes}` : null,
                 birth_place: document.getElementById('birthplace').value.trim(),
                 gender: document.querySelector('input[name="gender"]:checked')?.value || 'unspecified',
+                
+                // Опционально
+                birth_time: (() => {
+                    const time = parseTime(document.getElementById('birthtime').value);
+                    return time ? `${time.hours}:${time.minutes}` : null;
+                })(),
+                
+                // Метаданные
                 user_id: webApp.initDataUnsafe.user?.id || null,
                 username: webApp.initDataUnsafe.user?.username || null,
+                user_first_name: webApp.initDataUnsafe.user?.first_name || null,
+                user_last_name: webApp.initDataUnsafe.user?.last_name || null,
+                language: webApp.initDataUnsafe.user?.language_code || 'ru',
                 source: 'telegram_mini_app',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                platform: webApp.platform || 'unknown'
             };
 
             try {
-                // Сначала пробуем продакшн
-                let result = await sendWithRetry(WEBHOOKS.primary, formData, false);
+                // Сначала пробуем тестовый вебхук (он работает)
+                showToast('Отправка данных...', 'info');
                 
-                // Если продакшн не работает, пробуем тестовый
-                if (!result.success) {
-                    console.log('Production failed, trying test webhook...');
-                    showToast('Основной канал недоступен, пробуем резервный...', 'warning');
-                    
-                    result = await sendWithRetry(WEBHOOKS.test, formData, true);
-                }
-
+                let result = await sendToWebhook(WEBHOOKS.test, formData, 'ТЕСТОВЫЙ вебхук');
+                
+                // Если тестовый сработал - отлично
                 if (result.success) {
                     btnText.innerHTML = '✓ Отправлено!';
                     btnText.style.display = 'inline';
@@ -668,18 +646,43 @@
                     // Отправляем в Telegram
                     webApp.sendData(JSON.stringify({
                         ...formData,
-                        status: 'success'
+                        status: 'success',
+                        used_webhook: 'test'
+                    }));
+                    
+                    setTimeout(() => webApp.close(), 1500);
+                    return;
+                }
+                
+                // Если тестовый не сработал, пробуем продакшн
+                console.log('Тестовый вебхук не работает, пробуем продакшн...');
+                showToast('Пробуем основной канал...', 'warning');
+                
+                result = await sendToWebhook(WEBHOOKS.primary, formData, 'ПРОДАКШН вебхук');
+                
+                if (result.success) {
+                    btnText.innerHTML = '✓ Отправлено!';
+                    btnText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    
+                    showToast('Данные успешно отправлены!', 'success');
+                    
+                    webApp.sendData(JSON.stringify({
+                        ...formData,
+                        status: 'success',
+                        used_webhook: 'production'
                     }));
                     
                     setTimeout(() => webApp.close(), 1500);
                 } else {
-                    throw new Error(result.error || 'Unknown error');
+                    // Оба вебхука не работают
+                    throw new Error('Оба канала недоступны');
                 }
 
             } catch (error) {
-                console.error('Submission error:', error);
+                console.error('❌ Критическая ошибка:', error);
                 
-                showToast('Не удалось отправить данные. Попробуйте позже.', 'error');
+                showToast('Сервис временно недоступен. Попробуйте позже.', 'error');
                 
                 isSubmitting = false;
                 submitBtn.disabled = false;
@@ -690,26 +693,39 @@
 
         form.addEventListener('submit', submitForm);
 
-        // Тестовая отправка при загрузке (для отладки)
-        window.testProduction = async function() {
+        // Функция для диагностики
+        window.diagnose = async function() {
+            console.log('🔍 Диагностика вебхуков...');
+            
             const testData = {
-                name: "Тест",
+                name: "Диагностика",
                 birth_date: "1990-01-01",
                 birth_place: "Москва",
                 gender: "male",
-                test: true
+                diagnostic: true,
+                timestamp: new Date().toISOString()
             };
             
-            console.log('Testing production webhook...');
-            const result = await sendWithRetry(WEBHOOKS.primary, testData, false);
-            console.log('Production test result:', result);
+            console.log('\n📡 Тестируем продакшн вебхук:');
+            const prodResult = await sendToWebhook(WEBHOOKS.primary, testData, 'ПРОДАКШН');
             
-            console.log('Testing test webhook...');
-            const result2 = await sendWithRetry(WEBHOOKS.test, testData, true);
-            console.log('Test webhook result:', result2);
+            console.log('\n📡 Тестируем тестовый вебхук:');
+            const testResult = await sendToWebhook(WEBHOOKS.test, testData, 'ТЕСТОВЫЙ');
+            
+            console.log('\n📊 Результаты диагностики:');
+            console.log('Продакшн:', prodResult.success ? '✅ РАБОТАЕТ' : '❌ НЕ РАБОТАЕТ', prodResult);
+            console.log('Тестовый:', testResult.success ? '✅ РАБОТАЕТ' : '❌ НЕ РАБОТАЕТ', testResult);
+            
+            if (!prodResult.success && prodResult.status === 404) {
+                console.log('\n⚠️ Продакшн вебхук не активирован!');
+                console.log('👉 В n8n включите workflow (переключатель в правом верхнем углу)');
+            }
+            
+            return { prodResult, testResult };
         };
 
-        console.log('Form initialized. Run testProduction() to test webhooks');
+        console.log('✅ Форма загружена');
+        console.log('🔧 Для диагностики выполните в консоли: diagnose()');
 
     </script>
 </body>
