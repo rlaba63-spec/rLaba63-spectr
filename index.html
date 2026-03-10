@@ -272,46 +272,6 @@
                 opacity: 1;
             }
         }
-
-        .test-mode-badge {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
-        }
-
-        .test-mode-badge span {
-            font-size: 16px;
-        }
-
-        .dev-hint {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #0d47a1;
-            display: none;
-        }
-
-        .dev-hint.show {
-            display: block;
-        }
-
-        .dev-hint code {
-            background: rgba(0,0,0,0.05);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -322,20 +282,6 @@
                 <h1>Астроконсультант</h1>
                 <p>Заполните данные для расчета</p>
             </div>
-        </div>
-
-        <!-- Бейдж тестового режима (будет показан при необходимости) -->
-        <div class="test-mode-badge" id="testModeBadge" style="display: none;">
-            <span>🧪</span> Тестовый режим (отладка)
-        </div>
-
-        <!-- Подсказка для разработчика -->
-        <div class="dev-hint" id="devHint">
-            <strong>🔧 Для разработчика:</strong><br>
-            Тестовый вебхук требует активации в n8n.<br>
-            1. Откройте n8n<br>
-            2. Нажмите кнопку <code>Execute workflow</code><br>
-            3. Повторите отправку формы
         </div>
 
         <form id="astroForm" novalidate>
@@ -447,16 +393,15 @@
         };
 
         let isSubmitting = false;
-        let testWebhookAttempts = 0;
-        const MAX_TEST_ATTEMPTS = 2;
+        // По умолчанию используем продакшн (он должен быть всегда включен)
+        let currentWebhook = WEBHOOKS.primary;
+        let usingTestMode = false;
 
         const form = document.getElementById('astroForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = submitBtn.querySelector('.btn-text');
         const spinner = submitBtn.querySelector('.spinner');
         const toast = document.getElementById('toast');
-        const testModeBadge = document.getElementById('testModeBadge');
-        const devHint = document.getElementById('devHint');
 
         function showToast(message, type = 'info') {
             toast.textContent = message;
@@ -603,20 +548,19 @@
             }
         });
 
-        async function sendToWebhook(url, data, description) {
+        async function sendToWebhook(url, data) {
             try {
-                console.log(`📤 Отправка на ${description}:`, url);
+                console.log(`📤 Отправка на ${url === WEBHOOKS.test ? 'ТЕСТОВЫЙ' : 'ПРОДАКШН'}:`, url);
                 
                 const response = await fetch(url, {
                     method: 'POST',
-                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 });
 
-                console.log(`📥 Статус ответа от ${description}:`, response.status);
+                console.log(`📥 Статус:`, response.status);
                 
                 let responseData;
                 const contentType = response.headers.get('content-type');
@@ -627,37 +571,17 @@
                     responseData = await response.text();
                 }
                 
-                console.log(`📄 Ответ от ${description}:`, responseData);
-
                 return {
                     success: response.ok,
                     status: response.status,
-                    data: responseData,
-                    error: !response.ok ? responseData : null
+                    data: responseData
                 };
             } catch (error) {
-                console.log(`❌ Ошибка при отправке на ${description}:`, error.message);
                 return {
                     success: false,
-                    error: { message: error.message },
-                    data: null
+                    error: error.message
                 };
             }
-        }
-
-        function showTestModeHint(errorData) {
-            testModeBadge.style.display = 'inline-flex';
-            
-            // Показываем подсказку для разработчика
-            if (errorData && errorData.hint) {
-                devHint.querySelector('strong').textContent = '🔧 Инструкция от n8n:';
-                devHint.innerHTML += `<br><br>📌 <strong>${errorData.hint}</strong>`;
-                devHint.classList.add('show');
-            } else {
-                devHint.classList.add('show');
-            }
-            
-            showToast('Тестовый режим: требуется активация в n8n', 'warning');
         }
 
         async function submitForm(event) {
@@ -678,19 +602,14 @@
             const birthday = parseDate(document.getElementById('birthday').value);
             
             const formData = {
-                // Основные данные
                 name: document.getElementById('name').value.trim(),
                 birth_date: birthday ? `${birthday.year}-${birthday.month}-${birthday.day}` : null,
                 birth_place: document.getElementById('birthplace').value.trim(),
                 gender: document.querySelector('input[name="gender"]:checked')?.value || 'unspecified',
-                
-                // Опционально
                 birth_time: (() => {
                     const time = parseTime(document.getElementById('birthtime').value);
                     return time ? `${time.hours}:${time.minutes}` : null;
                 })(),
-                
-                // Метаданные
                 user_id: webApp.initDataUnsafe.user?.id || null,
                 username: webApp.initDataUnsafe.user?.username || null,
                 source: 'telegram_mini_app',
@@ -698,74 +617,65 @@
             };
 
             try {
-                // Сначала пробуем продакшн (он должен быть всегда активен)
-                console.log('📡 Пробуем продакшн вебхук...');
-                let result = await sendToWebhook(WEBHOOKS.primary, formData, 'ПРОДАКШН');
+                // Пробуем отправить на текущий вебхук
+                let result = await sendToWebhook(currentWebhook, formData);
                 
+                // Если текущий не работает и это продакшн - пробуем тестовый
+                if (!result.success && !usingTestMode) {
+                    console.log('⚠️ Продакшн не работает, пробуем тестовый...');
+                    showToast('Основной канал недоступен, пробуем резервный...', 'warning');
+                    
+                    usingTestMode = true;
+                    currentWebhook = WEBHOOKS.test;
+                    result = await sendToWebhook(currentWebhook, formData);
+                }
+                
+                // Если текущий не работает и это тестовый - пробуем продакшн
+                else if (!result.success && usingTestMode) {
+                    console.log('⚠️ Тестовый не работает, пробуем продакшн...');
+                    showToast('Резервный канал недоступен, пробуем основной...', 'warning');
+                    
+                    usingTestMode = false;
+                    currentWebhook = WEBHOOKS.primary;
+                    result = await sendToWebhook(currentWebhook, formData);
+                }
+
                 if (result.success) {
-                    // Продакшн работает - отлично!
                     btnText.innerHTML = '✓ Отправлено!';
                     btnText.style.display = 'inline';
                     spinner.style.display = 'none';
                     
-                    showToast('Данные успешно отправлены!', 'success');
-                    
-                    webApp.sendData(JSON.stringify({
-                        ...formData,
-                        status: 'success'
-                    }));
-                    
-                    setTimeout(() => webApp.close(), 1500);
-                    return;
-                }
-                
-                // Если продакшн не работает (404 - не активирован), пробуем тестовый
-                console.log('⚠️ Продакшн вебхук не активен, пробуем тестовый...');
-                
-                if (result.status === 404) {
-                    showToast('Основной канал настройки, используем тестовый...', 'warning');
-                }
-                
-                // Пробуем тестовый вебхук
-                result = await sendToWebhook(WEBHOOKS.test, formData, 'ТЕСТОВЫЙ');
-                
-                if (result.success) {
-                    // Тестовый сработал
-                    btnText.innerHTML = '✓ Отправлено (тест)!';
-                    btnText.style.display = 'inline';
-                    spinner.style.display = 'none';
-                    
-                    showToast('Данные отправлены в тестовом режиме', 'success');
-                    testModeBadge.style.display = 'inline-flex';
+                    const mode = usingTestMode ? 'тестовом' : 'основном';
+                    showToast(`Данные отправлены в ${mode} режиме!`, 'success');
                     
                     webApp.sendData(JSON.stringify({
                         ...formData,
                         status: 'success',
-                        mode: 'test'
+                        mode: usingTestMode ? 'test' : 'production'
                     }));
                     
                     setTimeout(() => webApp.close(), 1500);
-                    return;
+                } else {
+                    // Оба не работают
+                    console.log('❌ Оба вебхука недоступны');
+                    
+                    let errorMessage = 'Сервис временно недоступен';
+                    
+                    if (result.status === 404) {
+                        const errorText = typeof result.data === 'string' ? result.data : JSON.stringify(result.data);
+                        if (errorText.includes('POST')) {
+                            errorMessage = 'Ошибка отправки запроса';
+                        } else if (errorText.includes('not registered')) {
+                            errorMessage = 'Вебхук не активирован в n8n';
+                        }
+                    }
+                    
+                    showToast(errorMessage, 'error');
+                    throw new Error('all_webhooks_failed');
                 }
-                
-                // Если тестовый тоже не работает (404 - нужно нажать Execute workflow)
-                if (result.status === 404) {
-                    console.log('❌ Тестовый вебхук требует активации');
-                    showTestModeHint(result.data);
-                    throw new Error('test_webhook_inactive');
-                }
-                
-                // Другая ошибка
-                throw new Error(result.error?.message || 'Unknown error');
 
             } catch (error) {
                 console.error('❌ Ошибка:', error);
-                
-                if (error.message === 'test_webhook_inactive') {
-                    // Уже показали подсказку
-                } else {
-                    showToast('Сервис временно недоступен. Попробуйте позже.', 'error');
-                }
                 
                 isSubmitting = false;
                 submitBtn.disabled = false;
@@ -776,59 +686,49 @@
 
         form.addEventListener('submit', submitForm);
 
-        // Функция для диагностики с понятными инструкциями
-        window.diagnose = async function() {
-            console.log('🔍 Диагностика вебхуков n8n...');
-            console.log('=================================');
+        // Функция для проверки какого-то конкретного вебхука
+        window.checkWebhook = async function(type = 'primary') {
+            const url = type === 'test' ? WEBHOOKS.test : WEBHOOKS.primary;
+            const name = type === 'test' ? 'ТЕСТОВЫЙ' : 'ПРОДАКШН';
+            
+            console.log(`🔍 Проверка ${name} вебхука...`);
             
             const testData = {
-                name: "Диагностика",
+                name: "Проверка",
                 birth_date: "1990-01-01",
                 birth_place: "Москва",
                 gender: "male",
-                diagnostic: true,
+                test: true,
                 timestamp: new Date().toISOString()
             };
             
-            console.log('\n📡 Тестируем ПРОДАКШН вебхук:');
-            console.log(`URL: ${WEBHOOKS.primary}`);
-            const prodResult = await sendToWebhook(WEBHOOKS.primary, testData, 'ПРОДАКШН');
+            const result = await sendToWebhook(url, testData);
             
-            console.log('\n📡 Тестируем ТЕСТОВЫЙ вебхук:');
-            console.log(`URL: ${WEBHOOKS.test}`);
-            const testResult = await sendToWebhook(WEBHOOKS.test, testData, 'ТЕСТОВЫЙ');
+            console.log(`📊 Результат для ${name}:`, result);
             
-            console.log('\n📊 РЕЗУЛЬТАТЫ ДИАГНОСТИКИ:');
-            console.log('=================================');
-            
-            if (prodResult.success) {
-                console.log('✅ ПРОДАКШН: РАБОТАЕТ');
-            } else {
-                console.log('❌ ПРОДАКШН: НЕ РАБОТАЕТ');
-                if (prodResult.status === 404) {
-                    console.log('   → Нужно включить workflow в n8n (переключатель в правом верхнем углу)');
+            if (result.status === 404) {
+                const errorText = typeof result.data === 'string' ? result.data : JSON.stringify(result.data);
+                if (errorText.includes('POST')) {
+                    console.log(`   ❌ Проблема: метод POST не принимается`);
+                } else if (errorText.includes('not registered')) {
+                    console.log(`   ❌ Проблема: вебхук не активирован`);
+                    if (type === 'test') {
+                        console.log(`   🔧 Решение: нажмите "Execute workflow" в n8n`);
+                    } else {
+                        console.log(`   🔧 Решение: включите workflow (переключатель)`);
+                    }
                 }
+            } else if (result.success) {
+                console.log(`   ✅ Вебхук работает!`);
             }
             
-            if (testResult.success) {
-                console.log('✅ ТЕСТОВЫЙ: РАБОТАЕТ');
-            } else {
-                console.log('❌ ТЕСТОВЫЙ: НЕ РАБОТАЕТ');
-                if (testResult.status === 404) {
-                    console.log('   → В n8n нажмите кнопку "Execute workflow" и попробуйте снова');
-                }
-            }
-            
-            console.log('\n📝 Детали ошибок:');
-            console.log('Продакшн:', prodResult.error || 'Нет ошибки');
-            console.log('Тестовый:', testResult.error || 'Нет ошибки');
-            
-            return { prodResult, testResult };
+            return result;
         };
 
         console.log('✅ Форма загружена');
-        console.log('🔧 Для диагностики выполните в консоли: diagnose()');
-        console.log('📋 Следуйте инструкциям n8n для активации вебхуков');
+        console.log('📋 Для проверки вебхуков:');
+        console.log('   checkWebhook("primary") - проверить продакшн');
+        console.log('   checkWebhook("test") - проверить тестовый');
 
     </script>
 </body>
