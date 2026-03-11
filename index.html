@@ -122,11 +122,6 @@
             border-color: #dc3545;
         }
 
-        .field-input::placeholder {
-            color: var(--tg-theme-hint-color, #adb5bd);
-            opacity: 0.7;
-        }
-
         .radio-group {
             display: flex;
             gap: 12px;
@@ -272,6 +267,10 @@
             background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
         }
 
+        .toast.processing {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+        }
+
         @keyframes slideUp {
             from {
                 transform: translateY(100%);
@@ -283,9 +282,47 @@
             }
         }
 
-        /* Скрываем элементы отладки */
-        .debug-only {
-            display: none;
+        .processing-message {
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border-radius: 24px;
+            margin-top: 20px;
+            color: #4a148c;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.2);
+        }
+
+        .stars {
+            font-size: 32px;
+            margin-bottom: 16px;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.5; transform: scale(0.95); }
+        }
+
+        .processing-params {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 14px;
+            text-align: left;
+            backdrop-filter: blur(5px);
+        }
+
+        .processing-params div {
+            margin-bottom: 4px;
+            color: #6a1b9a;
+        }
+
+        .processing-params span {
+            font-weight: 600;
+            color: #4a148c;
         }
     </style>
 </head>
@@ -381,7 +418,6 @@
                 </div>
             </div>
 
-            <!-- Единая кнопка отправки -->
             <button type="submit" class="submit-btn" id="submitBtn">
                 <span class="btn-text">Получить консультацию</span>
                 <span class="spinner" style="display: none;"></span>
@@ -391,6 +427,25 @@
                 Нажимая кнопку, вы соглашаетесь с обработкой данных
             </div>
         </form>
+
+        <!-- Сообщение о длительной обработке с параметрами -->
+        <div id="processingMessage" style="display: none;">
+            <div class="processing-message">
+                <div class="stars">✨ ⭐ ✨</div>
+                <div style="font-size: 18px; margin-bottom: 8px;">🔮 Ваш персональный гороскоп готовится</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">Астрологические расчеты в процессе...</div>
+                
+                <!-- Параметры поиска -->
+                <div class="processing-params" id="processingParams">
+                    <!-- Заполняется динамически -->
+                </div>
+                
+                <div style="font-size: 13px; margin-top: 16px; color: #6a1b9a;">
+                    ⏱️ Обычно это занимает 1-2 минуты<br>
+                    📨 Результат придет в этот чат автоматически
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -402,29 +457,62 @@
 
         // Конфигурация вебхуков
         const WEBHOOKS = {
-            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',  // Продакшн
-            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'  // Тестовый (резервный)
+            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',
+            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'
         };
 
-        // Состояние
         let isSubmitting = false;
-        let currentMode = 'primary'; // primary или test
+        let currentMode = 'primary';
 
-        // DOM элементы
         const form = document.getElementById('astroForm');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = submitBtn.querySelector('.btn-text');
         const spinner = submitBtn.querySelector('.spinner');
         const toast = document.getElementById('toast');
+        const processingMessage = document.getElementById('processingMessage');
+        const processingParams = document.getElementById('processingParams');
 
-        // Показать уведомление
         function showToast(message, type = 'info') {
             toast.textContent = message;
             toast.className = `toast show ${type}`;
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Парсинг даты
+        function formatGender(gender) {
+            return gender === 'male' ? 'Мужской' : 'Женский';
+        }
+
+        function formatDateTime(dateStr, timeStr) {
+            let result = dateStr || 'не указана';
+            if (timeStr) {
+                result += ` в ${timeStr}`;
+            }
+            return result;
+        }
+
+        function showProcessingMessage(formData) {
+            // Форматируем данные для отображения
+            const gender = formData.gender === 'male' ? 'Мужской' : 'Женский';
+            const birthDateTime = formData.birth_time ? 
+                `${formData.birth_date} ${formData.birth_time}` : 
+                formData.birth_date;
+            
+            // Создаем HTML с параметрами
+            processingParams.innerHTML = `
+                <div><span>👤 Имя:</span> ${formData.name}</div>
+                <div><span>📅 Дата рождения:</span> ${formData.birth_date}</div>
+                ${formData.birth_time ? `<div><span>⏰ Время:</span> ${formData.birth_time}</div>` : ''}
+                <div><span>📍 Место:</span> ${formData.birth_place}</div>
+                <div><span>⚥ Пол:</span> ${gender}</div>
+                <div><span>🆔 Chat ID:</span> ${formData.chat_id}</div>
+                <div><span>🌐 Режим:</span> ${formData.mode === 'test' ? 'Тестовый' : 'Продакшн'}</div>
+            `;
+            
+            // Скрываем форму и показываем сообщение
+            form.style.display = 'none';
+            processingMessage.style.display = 'block';
+        }
+
         function parseDate(dateStr) {
             if (!dateStr) return null;
             dateStr = dateStr.trim();
@@ -455,7 +543,6 @@
             };
         }
 
-        // Парсинг времени
         function parseTime(timeStr) {
             if (!timeStr) return null;
             timeStr = timeStr.trim();
@@ -477,7 +564,6 @@
             };
         }
 
-        // Валидация поля
         function validateField(field) {
             const errorElement = document.getElementById(`${field.id}Error`);
             if (!errorElement) return true;
@@ -506,7 +592,6 @@
             return isValid;
         }
 
-        // Валидация всей формы
         function validateForm() {
             const fields = ['name', 'birthday', 'birthplace'];
             let isValid = fields.every(fieldId => validateField(document.getElementById(fieldId)));
@@ -517,7 +602,6 @@
             return isValid;
         }
 
-        // Добавляем обработчики валидации
         ['name', 'birthday', 'birthplace', 'birthtime'].forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
@@ -526,7 +610,6 @@
             }
         });
 
-        // Проверка доступности вебхука
         async function checkWebhookHealth(url) {
             try {
                 const controller = new AbortController();
@@ -535,10 +618,7 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        test: true, 
-                        timestamp: new Date().toISOString() 
-                    }),
+                    body: JSON.stringify({ test: true, timestamp: new Date().toISOString() }),
                     signal: controller.signal
                 });
                 
@@ -549,9 +629,7 @@
             }
         }
 
-        // Автоматический выбор доступного вебхука
         async function getAvailableWebhook() {
-            // Сначала проверяем продакшн
             const primaryAvailable = await checkWebhookHealth(WEBHOOKS.primary);
             if (primaryAvailable) {
                 currentMode = 'primary';
@@ -559,7 +637,6 @@
                 return WEBHOOKS.primary;
             }
 
-            // Если продакшн недоступен, пробуем тестовый
             const testAvailable = await checkWebhookHealth(WEBHOOKS.test);
             if (testAvailable) {
                 currentMode = 'test';
@@ -567,11 +644,9 @@
                 return WEBHOOKS.test;
             }
 
-            // Оба недоступны
             return null;
         }
 
-        // Сбор данных формы
         function getFormData() {
             const genderElement = document.querySelector('input[name="gender"]:checked');
             const birthday = parseDate(document.getElementById('birthday').value);
@@ -579,9 +654,17 @@
             
             const user = webApp.initDataUnsafe.user || {};
             const chat = webApp.initDataUnsafe.chat || {};
+            const startParam = webApp.initDataUnsafe.start_param || '';
 
             return {
-                // Данные формы
+                // Данные формы (для отображения)
+                name_display: document.getElementById('name').value.trim(),
+                birth_date_display: birthday ? `${birthday.day}.${birthday.month}.${birthday.year}` : null,
+                birth_time_display: birthtime ? `${birthtime.hours}:${birthtime.minutes}` : null,
+                birth_place_display: document.getElementById('birthplace').value.trim(),
+                gender_display: genderElement ? (genderElement.value === 'male' ? 'Мужской' : 'Женский') : 'Не указан',
+                
+                // Данные для API (форматированные)
                 name: document.getElementById('name').value.trim(),
                 birth_date: birthday ? `${birthday.year}-${birthday.month}-${birthday.day}` : null,
                 birth_time: birthtime ? `${birthtime.hours}:${birthtime.minutes}` : null,
@@ -591,19 +674,56 @@
                 // Данные пользователя Telegram
                 user_id: user.id || null,
                 chat_id: chat.id || user.id || null,
+                chat_type: chat.type || 'private',
+                chat_title: chat.title || null,
                 username: user.username || null,
                 first_name: user.first_name || null,
                 last_name: user.last_name || null,
                 language_code: user.language_code || 'ru',
+                is_premium: user.is_premium || false,
                 
-                // Метаданные
+                // Параметры запуска
+                start_param: startParam,
+                
+                // Метаданные для поиска и обработки
                 source: 'telegram_mini_app',
+                mode: currentMode,
                 timestamp: new Date().toISOString(),
-                platform: webApp.platform || 'unknown'
+                platform: webApp.platform || 'unknown',
+                version: webApp.version || 'unknown',
+                
+                // Параметры для астрологического расчета
+                calculation_params: {
+                    houses_system: 'placidus',  // Система домов
+                    aspects: ['conjunction', 'opposition', 'trine', 'square', 'sextile'],
+                    orbs: {
+                        sun: 8,
+                        moon: 8,
+                        planets: 6,
+                        angles: 1
+                    },
+                    include_fixed_stars: true,
+                    include_asteroids: false,
+                    zodiac_type: 'tropical',  // tropical/sidereal
+                    interpretation_language: user.language_code || 'ru'
+                },
+                
+                // Что именно рассчитывать
+                forecast_type: 'natal',  // natal, transit, progression, synastry
+                forecast_period: {
+                    start: new Date().toISOString().split('T')[0],
+                    end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // +30 дней
+                },
+                
+                // Дополнительные опции
+                options: {
+                    send_to_chat: true,
+                    notify_when_ready: true,
+                    priority: 'normal'  // normal, high
+                }
             };
         }
 
-        // Отправка формы
         async function submitForm(event) {
             event.preventDefault();
 
@@ -614,7 +734,6 @@
                 return;
             }
 
-            // Показываем процесс отправки
             isSubmitting = true;
             submitBtn.disabled = true;
             btnText.style.display = 'none';
@@ -622,20 +741,16 @@
             showToast('Отправка данных...', 'info');
 
             try {
-                // Получаем доступный вебхук
                 const webhook = await getAvailableWebhook();
                 
                 if (!webhook) {
                     showToast('Сервис временно недоступен. Попробуйте позже.', 'error');
-                    submitBtn.disabled = false;
-                    btnText.style.display = 'inline';
-                    spinner.style.display = 'none';
-                    isSubmitting = false;
+                    resetForm();
                     return;
                 }
 
                 const formData = getFormData();
-                console.log(`Sending to ${currentMode} webhook`);
+                console.log(`Sending to ${currentMode} webhook with params:`, formData);
 
                 const response = await fetch(webhook, {
                     method: 'POST',
@@ -644,41 +759,56 @@
                 });
 
                 if (response.ok) {
-                    showToast('Данные успешно отправлены!', 'success');
+                    // Показываем сообщение о длительной обработке с параметрами
+                    showProcessingMessage(formData);
                     
-                    // Отправляем в Telegram и закрываем
+                    // Отправляем подтверждение в Telegram со всеми параметрами
                     webApp.sendData(JSON.stringify({
                         ...formData,
-                        status: 'success'
+                        status: 'processing',
+                        message: '🔮 Астрологический расчет запущен',
+                        estimated_time: '1-2 минуты',
+                        notification: 'Результат придет в этот чат автоматически'
                     }));
                     
-                    setTimeout(() => webApp.close(), 2000);
+                    // Можно закрыть WebApp через 3 секунды
+                    setTimeout(() => {
+                        webApp.close();
+                    }, 3000);
+                    
                 } else {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
                     throw new Error(`HTTP ${response.status}`);
                 }
 
             } catch (error) {
                 console.error('Submission error:', error);
                 showToast('Ошибка при отправке. Попробуйте еще раз.', 'error');
-                
-                submitBtn.disabled = false;
-                btnText.style.display = 'inline';
-                spinner.style.display = 'none';
-                isSubmitting = false;
+                resetForm();
             }
         }
 
-        // Обработчик формы
+        function resetForm() {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline';
+            spinner.style.display = 'none';
+        }
+
         form.addEventListener('submit', submitForm);
 
         // Инициализация
         (async function() {
-            console.log('Production form initialized');
-            
-            // Проверяем доступность при загрузке
+            console.log('Production form initialized with search params');
             const webhook = await getAvailableWebhook();
             if (!webhook) {
                 showToast('Сервис временно недоступен', 'warning');
+            }
+            
+            // Логируем параметры запуска для отладки
+            if (webApp.initDataUnsafe.start_param) {
+                console.log('Start param:', webApp.initDataUnsafe.start_param);
             }
         })();
 
