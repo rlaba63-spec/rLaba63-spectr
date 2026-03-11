@@ -90,11 +90,14 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--tg-theme-text-color, #000000);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .required-star {
             color: #dc3545;
-            margin-left: 4px;
+            font-size: 14px;
         }
 
         .field-input {
@@ -119,6 +122,11 @@
             border-color: #dc3545;
         }
 
+        .field-input::placeholder {
+            color: var(--tg-theme-hint-color, #adb5bd);
+            opacity: 0.7;
+        }
+
         .radio-group {
             display: flex;
             gap: 12px;
@@ -133,6 +141,8 @@
         .radio-option input[type="radio"] {
             position: absolute;
             opacity: 0;
+            width: 0;
+            height: 0;
         }
 
         .radio-label {
@@ -155,192 +165,35 @@
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-        }
-
-        /* Панель статуса вебхуков */
-        .webhook-panel {
-            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .webhook-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #e9ecef);
-        }
-
-        .webhook-row:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .webhook-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .webhook-icon.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .webhook-icon.test {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-        }
-
-        .webhook-info {
-            flex: 1;
-        }
-
-        .webhook-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .webhook-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: var(--tg-theme-bg-color, #ffffff);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-dot.available {
-            background: #4caf50;
-            box-shadow: 0 0 8px #4caf50;
-        }
-
-        .status-dot.unavailable {
-            background: #f44336;
-        }
-
-        .webhook-url {
-            font-size: 12px;
-            color: var(--tg-theme-hint-color, #6c757d);
-            word-break: break-all;
-        }
-
-        .webhook-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            border: 1px solid var(--tg-theme-hint-color, #dee2e6);
-        }
-
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .action-btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-        }
-
-        .action-btn.test {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-            border: none;
-        }
-
-        /* Инструкция по активации */
-        .activation-instruction {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 16px;
-            border-radius: 12px;
-            margin-top: 16px;
-            font-size: 14px;
-            color: #0d47a1;
-        }
-
-        .activation-instruction code {
-            background: rgba(0,0,0,0.05);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-        }
-
-        .activation-instruction ol {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        .activation-instruction li {
-            margin-bottom: 4px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .submit-btn {
-            flex: 1;
+            width: 100%;
             padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
             border-radius: 20px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .submit-btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .submit-btn.test {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
         }
 
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        .submit-btn.test-mode {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
         }
 
         .spinner {
@@ -361,6 +214,7 @@
             color: #dc3545;
             font-size: 13px;
             margin-top: 6px;
+            margin-left: 4px;
             display: none;
         }
 
@@ -372,6 +226,7 @@
             font-size: 12px;
             color: var(--tg-theme-hint-color, #6c757d);
             margin-top: 4px;
+            margin-left: 4px;
         }
 
         .footer {
@@ -427,6 +282,11 @@
                 opacity: 1;
             }
         }
+
+        /* Скрываем элементы отладки */
+        .debug-only {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -435,54 +295,7 @@
             <div class="header-icon">🔮</div>
             <div class="header-title">
                 <h1>Астроконсультант</h1>
-                <p>Управление вебхуками n8n</p>
-            </div>
-        </div>
-
-        <!-- Панель управления вебхуками -->
-        <div class="webhook-panel">
-            <!-- Продакшн вебхук -->
-            <div class="webhook-row">
-                <div class="webhook-icon primary">🚀</div>
-                <div class="webhook-info">
-                    <div class="webhook-name">
-                        Продакшн вебхук
-                        <span class="webhook-status" id="prodStatus">
-                            <span class="status-dot" id="prodDot"></span>
-                            <span id="prodStatusText">проверка...</span>
-                        </span>
-                    </div>
-                    <div class="webhook-url" id="prodUrl">https://nx8.zaltrix.org/webhook/telegram-form</div>
-                </div>
-                <div class="webhook-actions">
-                    <button class="action-btn" id="checkProdBtn" onclick="checkProd()">🔄</button>
-                    <button class="action-btn primary" id="activateProdBtn" onclick="showProdInstructions()">ℹ️</button>
-                </div>
-            </div>
-
-            <!-- Тестовый вебхук -->
-            <div class="webhook-row">
-                <div class="webhook-icon test">🧪</div>
-                <div class="webhook-info">
-                    <div class="webhook-name">
-                        Тестовый вебхук
-                        <span class="webhook-status" id="testStatus">
-                            <span class="status-dot" id="testDot"></span>
-                            <span id="testStatusText">проверка...</span>
-                        </span>
-                    </div>
-                    <div class="webhook-url" id="testUrl">https://nx8.zaltrix.org/webhook-test/telegram-form</div>
-                </div>
-                <div class="webhook-actions">
-                    <button class="action-btn" id="checkTestBtn" onclick="checkTest()">🔄</button>
-                    <button class="action-btn test" id="activateTestBtn" onclick="showTestInstructions()">ℹ️</button>
-                </div>
-            </div>
-
-            <!-- Инструкция по активации (динамически обновляется) -->
-            <div class="activation-instruction" id="instructionBox">
-                <strong>🔧 Инструкция по активации:</strong>
-                <div id="instructionContent">Выберите вебхук для просмотра инструкции</div>
+                <p>Заполните данные для расчета</p>
             </div>
         </div>
 
@@ -499,7 +312,7 @@
                         class="field-input" 
                         placeholder="Александр"
                         required
-                        value="Тест"
+                        maxlength="50"
                     >
                     <div class="error-message" id="nameError">Укажите ваше имя</div>
                 </div>
@@ -516,9 +329,8 @@
                             class="field-input" 
                             placeholder="ДД.ММ.ГГГГ"
                             required
-                            value="01.01.1990"
                         >
-                        <div class="hint">Форматы: 01.01.1990, 01/01/1990</div>
+                        <div class="hint">Форматы: 01.01.1990, 01/01/1990, 01-01-1990</div>
                         <div class="error-message" id="birthdayError">Укажите дату рождения</div>
                     </div>
 
@@ -532,7 +344,7 @@
                             class="field-input" 
                             placeholder="ЧЧ:ММ"
                         >
-                        <div class="hint">Если не знаете оставьте пустым</div>
+                        <div class="hint">Если знаете точное время</div>
                     </div>
                 </div>
 
@@ -547,7 +359,6 @@
                         class="field-input" 
                         placeholder="Москва"
                         required
-                        value="Москва"
                     >
                     <div class="error-message" id="birthplaceError">Укажите место рождения</div>
                 </div>
@@ -570,17 +381,11 @@
                 </div>
             </div>
 
-            <!-- Кнопки отправки -->
-            <div class="button-group">
-                <button type="button" class="submit-btn test" id="testBtn">
-                    <span class="btn-text">🧪 Отправить тест</span>
-                    <span class="spinner" style="display: none;"></span>
-                </button>
-                <button type="button" class="submit-btn primary" id="prodBtn">
-                    <span class="btn-text">🚀 Отправить в прод</span>
-                    <span class="spinner" style="display: none;"></span>
-                </button>
-            </div>
+            <!-- Единая кнопка отправки -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="btn-text">Получить консультацию</span>
+                <span class="spinner" style="display: none;"></span>
+            </button>
 
             <div class="footer">
                 Нажимая кнопку, вы соглашаетесь с обработкой данных
@@ -597,33 +402,29 @@
 
         // Конфигурация вебхуков
         const WEBHOOKS = {
-            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',
-            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'
+            primary: 'https://nx8.zaltrix.org/webhook/telegram-form',  // Продакшн
+            test: 'https://nx8.zaltrix.org/webhook-test/telegram-form'  // Тестовый (резервный)
         };
 
+        // Состояние
         let isSubmitting = false;
-        let prodAvailable = false;
-        let testAvailable = false;
+        let currentMode = 'primary'; // primary или test
 
         // DOM элементы
         const form = document.getElementById('astroForm');
-        const testBtn = document.getElementById('testBtn');
-        const prodBtn = document.getElementById('prodBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const spinner = submitBtn.querySelector('.spinner');
         const toast = document.getElementById('toast');
-        
-        // Элементы статуса
-        const prodDot = document.getElementById('prodDot');
-        const prodStatusText = document.getElementById('prodStatusText');
-        const testDot = document.getElementById('testDot');
-        const testStatusText = document.getElementById('testStatusText');
-        const instructionContent = document.getElementById('instructionContent');
 
+        // Показать уведомление
         function showToast(message, type = 'info') {
             toast.textContent = message;
             toast.className = `toast show ${type}`;
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // Парсинг даты
         function parseDate(dateStr) {
             if (!dateStr) return null;
             dateStr = dateStr.trim();
@@ -644,6 +445,9 @@
             const date = new Date(year, month - 1, day);
             if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) return null;
             
+            const currentYear = new Date().getFullYear();
+            if (year < 1900 || year > currentYear) return null;
+            
             return {
                 day: day.toString().padStart(2, '0'),
                 month: month.toString().padStart(2, '0'),
@@ -651,6 +455,7 @@
             };
         }
 
+        // Парсинг времени
         function parseTime(timeStr) {
             if (!timeStr) return null;
             timeStr = timeStr.trim();
@@ -672,6 +477,7 @@
             };
         }
 
+        // Валидация поля
         function validateField(field) {
             const errorElement = document.getElementById(`${field.id}Error`);
             if (!errorElement) return true;
@@ -680,10 +486,18 @@
             if (field.required && !field.value.trim()) isValid = false;
             else if (field.value.trim()) {
                 switch(field.id) {
-                    case 'name': isValid = field.value.trim().length >= 2; break;
-                    case 'birthday': isValid = parseDate(field.value) !== null; break;
-                    case 'birthtime': if (field.value.trim()) isValid = parseTime(field.value) !== null; break;
-                    case 'birthplace': isValid = field.value.trim().length >= 2; break;
+                    case 'name':
+                        isValid = field.value.trim().length >= 2;
+                        break;
+                    case 'birthday':
+                        isValid = parseDate(field.value) !== null;
+                        break;
+                    case 'birthtime':
+                        if (field.value.trim()) isValid = parseTime(field.value) !== null;
+                        break;
+                    case 'birthplace':
+                        isValid = field.value.trim().length >= 2;
+                        break;
                 }
             }
 
@@ -692,6 +506,7 @@
             return isValid;
         }
 
+        // Валидация всей формы
         function validateForm() {
             const fields = ['name', 'birthday', 'birthplace'];
             let isValid = fields.every(fieldId => validateField(document.getElementById(fieldId)));
@@ -720,106 +535,41 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ test: true, timestamp: new Date().toISOString() }),
+                    body: JSON.stringify({ 
+                        test: true, 
+                        timestamp: new Date().toISOString() 
+                    }),
                     signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
-                
-                // Если вернулся 404 с сообщением о регистрации - вебхук существует, но не активирован
-                if (response.status === 404) {
-                    const data = await response.json().catch(() => ({}));
-                    if (data.message?.includes('not registered')) {
-                        return { available: false, exists: true, needsActivation: true };
-                    }
-                }
-                
-                return { available: response.ok, exists: true, needsActivation: false };
-            } catch (error) {
-                return { available: false, exists: false, needsActivation: false, error: error.message };
+                return response.ok;
+            } catch {
+                return false;
             }
         }
 
-        // Обновление статуса
-        async function updateStatus() {
-            const [prod, test] = await Promise.all([
-                checkWebhookHealth(WEBHOOKS.primary),
-                checkWebhookHealth(WEBHOOKS.test)
-            ]);
-
-            prodAvailable = prod.available;
-            testAvailable = test.available;
-
-            // Обновляем продакшн статус
-            if (prod.available) {
-                prodDot.className = 'status-dot available';
-                prodStatusText.textContent = 'доступен';
-            } else if (prod.needsActivation) {
-                prodDot.className = 'status-dot unavailable';
-                prodStatusText.textContent = 'требует активации';
-            } else {
-                prodDot.className = 'status-dot unavailable';
-                prodStatusText.textContent = 'недоступен';
+        // Автоматический выбор доступного вебхука
+        async function getAvailableWebhook() {
+            // Сначала проверяем продакшн
+            const primaryAvailable = await checkWebhookHealth(WEBHOOKS.primary);
+            if (primaryAvailable) {
+                currentMode = 'primary';
+                submitBtn.classList.remove('test-mode');
+                return WEBHOOKS.primary;
             }
 
-            // Обновляем тестовый статус
-            if (test.available) {
-                testDot.className = 'status-dot available';
-                testStatusText.textContent = 'доступен';
-            } else if (test.needsActivation) {
-                testDot.className = 'status-dot unavailable';
-                testStatusText.textContent = 'требует активации';
-            } else {
-                testDot.className = 'status-dot unavailable';
-                testStatusText.textContent = 'недоступен';
+            // Если продакшн недоступен, пробуем тестовый
+            const testAvailable = await checkWebhookHealth(WEBHOOKS.test);
+            if (testAvailable) {
+                currentMode = 'test';
+                submitBtn.classList.add('test-mode');
+                return WEBHOOKS.test;
             }
 
-            return { prod, test };
+            // Оба недоступны
+            return null;
         }
-
-        // Показать инструкцию для продакшн
-        function showProdInstructions() {
-            instructionContent.innerHTML = `
-                <strong>🚀 Активация продакшн вебхука:</strong>
-                <ol style="margin-top: 8px;">
-                    <li>Откройте n8n редактор</li>
-                    <li>Найдите ваш workflow с вебхуком</li>
-                    <li>В правом верхнем углу нажмите <strong>переключатель "Active"</strong> [citation:7]</li>
-                    <li>Убедитесь, что workflow сохранен</li>
-                    <li>После активации вебхук будет принимать запросы 24/7</li>
-                </ol>
-                <p style="margin-top: 8px; color: #666;">🔔 Продакшн вебхуки работают постоянно после активации [citation:8]</p>
-            `;
-            showToast('Инструкция для продакшн обновлена', 'info');
-        }
-
-        // Показать инструкцию для тестового
-        function showTestInstructions() {
-            instructionContent.innerHTML = `
-                <strong>🧪 Активация тестового вебхука:</strong>
-                <ol style="margin-top: 8px;">
-                    <li>Откройте n8n редактор</li>
-                    <li>В узле Webhook нажмите <strong>"Listen for test event"</strong> [citation:7]</li>
-                    <li>Вебхук активируется на 120 секунд [citation:7]</li>
-                    <li>Быстро отправьте тестовые данные из этой формы</li>
-                    <li>После получения данных вы увидите их в редакторе n8n</li>
-                </ol>
-                <p style="margin-top: 8px; color: #666;">⏱️ Тестовый вебхук активен только 2 минуты после нажатия кнопки</p>
-                <p style="margin-top: 4px; color: #f57c00;">💡 Нажмите "Listen for test event" и сразу отправляйте форму!</p>
-            `;
-            showToast('Инструкция для тестового обновлена', 'info');
-        }
-
-        // Функции для кнопок
-        window.checkProd = async () => {
-            showToast('Проверка продакшн...', 'info');
-            await updateStatus();
-        };
-
-        window.checkTest = async () => {
-            showToast('Проверка тестового...', 'info');
-            await updateStatus();
-        };
 
         // Сбор данных формы
         function getFormData() {
@@ -831,102 +581,106 @@
             const chat = webApp.initDataUnsafe.chat || {};
 
             return {
+                // Данные формы
                 name: document.getElementById('name').value.trim(),
                 birth_date: birthday ? `${birthday.year}-${birthday.month}-${birthday.day}` : null,
                 birth_time: birthtime ? `${birthtime.hours}:${birthtime.minutes}` : null,
                 birth_place: document.getElementById('birthplace').value.trim(),
                 gender: genderElement ? genderElement.value : 'unspecified',
+                
+                // Данные пользователя Telegram
                 user_id: user.id || null,
                 chat_id: chat.id || user.id || null,
                 username: user.username || null,
                 first_name: user.first_name || null,
+                last_name: user.last_name || null,
                 language_code: user.language_code || 'ru',
+                
+                // Метаданные
                 source: 'telegram_mini_app',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                platform: webApp.platform || 'unknown'
             };
         }
 
         // Отправка формы
-        async function sendForm(mode) {
+        async function submitForm(event) {
+            event.preventDefault();
+
             if (isSubmitting) return;
+
             if (!validateForm()) {
-                showToast('Заполните обязательные поля', 'error');
+                showToast('Пожалуйста, заполните все обязательные поля', 'error');
                 return;
             }
 
-            const isAvailable = mode === 'prod' ? prodAvailable : testAvailable;
-            if (!isAvailable) {
-                showToast(`${mode === 'prod' ? 'Продакшн' : 'Тестовый'} режим недоступен. Нажмите кнопку "ℹ️" для инструкции.`, 'warning');
-                return;
-            }
-
+            // Показываем процесс отправки
             isSubmitting = true;
-            const btn = mode === 'prod' ? prodBtn : testBtn;
-            const btnText = btn.querySelector('.btn-text');
-            const spinner = btn.querySelector('.spinner');
-            
-            btn.disabled = true;
+            submitBtn.disabled = true;
             btnText.style.display = 'none';
             spinner.style.display = 'inline-block';
-
-            const formData = getFormData();
-            formData.mode = mode;
+            showToast('Отправка данных...', 'info');
 
             try {
-                const url = mode === 'prod' ? WEBHOOKS.primary : WEBHOOKS.test;
-                console.log(`Sending to ${mode}:`, url);
+                // Получаем доступный вебхук
+                const webhook = await getAvailableWebhook();
                 
-                const response = await fetch(url, {
+                if (!webhook) {
+                    showToast('Сервис временно недоступен. Попробуйте позже.', 'error');
+                    submitBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    isSubmitting = false;
+                    return;
+                }
+
+                const formData = getFormData();
+                console.log(`Sending to ${currentMode} webhook`);
+
+                const response = await fetch(webhook, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
 
                 if (response.ok) {
-                    showToast(`Данные отправлены в ${mode === 'prod' ? 'продакшн' : 'тестовый'} режим!`, 'success');
-                    webApp.sendData(JSON.stringify({ ...formData, status: 'success' }));
+                    showToast('Данные успешно отправлены!', 'success');
+                    
+                    // Отправляем в Telegram и закрываем
+                    webApp.sendData(JSON.stringify({
+                        ...formData,
+                        status: 'success'
+                    }));
+                    
                     setTimeout(() => webApp.close(), 2000);
                 } else {
-                    const errorText = await response.text();
-                    console.error('Server error:', errorText);
-                    
-                    // Если получили 404 с сообщением о регистрации
-                    if (response.status === 404 && errorText.includes('not registered')) {
-                        showToast('Вебхук не активирован. Следуйте инструкции.', 'warning');
-                        if (mode === 'prod') showProdInstructions();
-                        else showTestInstructions();
-                    } else {
-                        showToast(`Ошибка ${response.status}`, 'error');
-                    }
+                    throw new Error(`HTTP ${response.status}`);
                 }
+
             } catch (error) {
                 console.error('Submission error:', error);
-                showToast('Ошибка подключения', 'error');
-            } finally {
-                isSubmitting = false;
-                btn.disabled = false;
+                showToast('Ошибка при отправке. Попробуйте еще раз.', 'error');
+                
+                submitBtn.disabled = false;
                 btnText.style.display = 'inline';
                 spinner.style.display = 'none';
+                isSubmitting = false;
             }
         }
 
-        // Обработчики
-        testBtn.addEventListener('click', () => sendForm('test'));
-        prodBtn.addEventListener('click', () => sendForm('prod'));
+        // Обработчик формы
+        form.addEventListener('submit', submitForm);
 
         // Инициализация
         (async function() {
-            console.log('Form initialized with activation instructions');
-            await updateStatus();
-            showProdInstructions(); // Показываем инструкцию по умолчанию
-            setInterval(updateStatus, 30000);
+            console.log('Production form initialized');
+            
+            // Проверяем доступность при загрузке
+            const webhook = await getAvailableWebhook();
+            if (!webhook) {
+                showToast('Сервис временно недоступен', 'warning');
+            }
         })();
-
-        // Делаем функции глобальными для кнопок
-        window.showProdInstructions = showProdInstructions;
-        window.showTestInstructions = showTestInstructions;
-        window.checkProd = checkProd;
-        window.checkTest = checkTest;
 
     </script>
 </body>
